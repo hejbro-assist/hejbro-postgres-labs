@@ -41,7 +41,7 @@
 
 ## 7. provider 준비 (사용자 작업)
 
-- [ ] 7.1 사용자가 Neon 프로젝트를 만들고 direct(non-pooled) 접속 문자열을 `.env`의 `NEON_DATABASE_URL`에 넣는다. `pnpm target doctor`에서 `neon`이 연결 성공으로 표시되는지 확인한다
+- [x] 7.1 사용자가 Neon 프로젝트를 만들고 direct(non-pooled) 접속 문자열을 `.env`의 `NEON_DATABASE_URL`에 넣는다. `pnpm target doctor`에서 `neon`이 연결 성공으로 표시되는지 확인한다
 - [ ] 7.2 사용자가 Nile 데이터베이스를 만들고 접속 문자열을 `NILE_DATABASE_URL`에 넣는다. `doctor`에서 `nile`이 연결 성공인지 확인한다
 - [ ] 7.3 사용자가 Supabase 프로젝트를 만들고 direct 또는 session pooler(5432) 접속 문자열을 `SUPABASE_DATABASE_URL`에 넣는다. `doctor`에서 `supabase`가 연결 성공인지 확인한다
 
@@ -50,7 +50,7 @@
 - [x] 8.1 `postgres` 타깃에 `migrate` → `check` → `migrate`(재실행)를 돌려 exit 0 / 0 / "nothing to apply"인지 확인하고 결과를 기록한다
 - [ ] 8.2 `nile` 타깃에 같은 순서를 돌린다. `lab` 스키마나 FK가 거부되면 D9의 리스크 절차(체인 리셋 후 `public`으로 재생성)를 따르고 finding을 작성한다
 - [ ] 8.3 `supabase` 타깃에 같은 순서를 돌리고 결과를 기록한다
-- [ ] 8.4 `neon` 타깃에 같은 순서를 돌리고 결과를 기록한다
+- [x] 8.4 `neon` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [ ] 8.5 `RESULTS.md`에 네 행(타깃, hejbro 버전, Postgres 버전, migrate/check 결과, 비고)을 작성하고 커밋한다
 - [x] 8.6 `git log -p`와 CI 로그에서 `://[^/]*:[^@]*@` 패턴을 grep해 접속 문자열이 한 건도 없는지 확인한다
 
