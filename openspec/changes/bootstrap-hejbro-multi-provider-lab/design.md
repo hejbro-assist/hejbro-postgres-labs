@@ -48,7 +48,7 @@ compose 플러그인이 없으므로 `scripts/local-pg.sh up|down|logs`가 `post
 
 ### D8. provider 접속 경로
 - Neon: 콘솔의 direct(non-pooled) 접속 문자열. pooled 엔드포인트는 PgBouncer transaction 모드라 `migrate`에 부적합하다.
-- Supabase: direct 접속 또는 session-mode pooler(5432). transaction-mode(6543) 금지.
+- Supabase: session-mode pooler(5432). direct 주소는 IPv6 전용이라 IPv6가 없는 WSL에서 닿지 않았다(2026-09-03). pooler 인증서는 Supabase 자체 CA(`certs/supabase-prod-ca-2021.crt`, 공개 인증서라 커밋)로 서명되어 `sslrootcert`를 접속 문자열에 붙인다. 검증을 끄는 `uselibpqcompat`는 쓰지 않는다. transaction-mode(6543) 금지.
 - Nile: 콘솔의 표준 5432 접속 문자열.
 - 세 provider 모두 `sslmode=require`가 문자열에 포함되어야 한다. 스크립트는 host가 `localhost`가 아닌데 `sslmode`가 없으면 경고한다.
 
