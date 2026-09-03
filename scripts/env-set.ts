@@ -60,13 +60,29 @@ const clearClipboard = (): void => {
 
 const readStdin = (): string => readFileSync(0, "utf8").trim();
 
+const CONNECTION_PATTERN = /postgres(?:ql)?:\/\/[^\s'"`]+/;
+
+/**
+ * 입력에서 접속 문자열만 골라낸다. `psql 'postgresql://…'`, `DATABASE_URL=postgresql://…`,
+ * 따옴표로 감싼 형태처럼 콘솔이 주는 여러 포장을 벗긴다.
+ */
+const extractConnection = (raw: string): string => {
+	const match = CONNECTION_PATTERN.exec(raw);
+	if (match === null) {
+		return fail(
+			`입력에서 postgres:// 로 시작하는 접속 문자열을 찾지 못했습니다 (입력 길이 ${raw.length}자). 값은 출력하지 않습니다.`,
+		);
+	}
+	return match[0];
+};
+
 /** 접속 문자열을 검증하고, 비로컬 host 에 sslmode 가 없으면 require 를 붙인다. */
 const normalizeConnection = (raw: string): { readonly value: string; readonly label: string } => {
 	const parsed = (() => {
 		try {
-			return new URL(raw);
+			return new URL(extractConnection(raw));
 		} catch (error: unknown) {
-			return fail("클립보드 내용이 URL 형식이 아닙니다. 값은 출력하지 않습니다.");
+			return fail("접속 문자열을 URL 로 해석하지 못했습니다. 값은 출력하지 않습니다.");
 		}
 	})();
 	if (!ALLOWED_PROTOCOLS.some((protocol) => protocol === parsed.protocol)) {
