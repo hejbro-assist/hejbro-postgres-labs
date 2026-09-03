@@ -1,5 +1,111 @@
 {
 	"dialect": "postgres",
 	"formatVersion": 8,
-	"objects": {}
+	"objects": {
+		"schema:lab": {
+			"name": "lab"
+		},
+		"table:lab.projects": {
+			"checks": [
+				{
+					"expression": {
+						"chunks": [
+							{
+								"chunkKind": "text",
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "name",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "projects"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
+							}
+						],
+						"nodeKind": "sql-template"
+					},
+					"name": "projects_name_not_blank"
+				}
+			],
+			"columns": [
+				{
+					"default": {
+						"args": [],
+						"function": "gen_random_uuid",
+						"nodeKind": "function-call",
+						"schema": null
+					},
+					"name": "id",
+					"notNull": true,
+					"primaryKey": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
+				{
+					"name": "tenant_id",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
+				{
+					"name": "name",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "text"
+					}
+				},
+				{
+					"name": "archived_at",
+					"typeNode": {
+						"typeName": "timestamptz"
+					}
+				},
+				{
+					"default": {
+						"args": [],
+						"function": "now",
+						"nodeKind": "function-call",
+						"schema": null
+					},
+					"name": "created_at",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "timestamptz"
+					}
+				}
+			],
+			"foreignKeys": [],
+			"indexes": [
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						}
+					],
+					"name": "projects_tenant_id_idx",
+					"where": {
+						"negated": false,
+						"nodeKind": "null-test",
+						"operand": {
+							"column": "archived_at",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "projects"
+						}
+					}
+				}
+			],
+			"name": "projects",
+			"primaryKeyName": "projects_pkey",
+			"schema": "lab"
+		}
+	}
 }
