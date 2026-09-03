@@ -57,4 +57,4 @@
 ## 9. 첫 피드백
 
 - [x] 9.1 8단계에서 나온 발견 사항 중 최소 한 건을 `findings/`에 작성하고 `pnpm finding validate`가 통과하는지 확인한다
-- [x] 9.2 `pnpm finding post`로 게시하고 discussion 작성자가 `hejbro-assist`인지, 파일에 URL이 기록되었는지 확인한다
+- [ ] 9.2 `pnpm finding post`로 게시하고 discussion 작성자가 `hejbro-assist`인지, 파일에 URL이 기록되었는지 확인한다
