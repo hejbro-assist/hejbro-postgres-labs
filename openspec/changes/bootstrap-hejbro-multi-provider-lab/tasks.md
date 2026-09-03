@@ -10,7 +10,7 @@
 - [ ] 2.1 `.gitignore`에 `.env`, `.env.local`, `.env.*.local`, `*.pem`, `*.key`를 추가하고 `.env` 더미 파일을 만들어 `git status`에 나타나지 않는지 확인한 뒤 더미를 지운다
 - [ ] 2.2 `.env.example`에 네 변수(`NEON_DATABASE_URL`, `NILE_DATABASE_URL`, `SUPABASE_DATABASE_URL`, `POSTGRES_DATABASE_URL`)를 `USER:PASSWORD` placeholder(postgres는 로컬 실제 기본값)와 provider별 접속 경로 주석(D8)으로 작성하고 파일이 커밋 가능한지 확인한다
 - [x] 2.3 `secretlint`, `@secretlint/secretlint-rule-preset-recommend`, `@secretlint/secretlint-rule-pattern`을 devDependency로 추가하고 `.secretlintrc.json`(preset + provider 호스트 패턴)과 `.secretlintignore`(`pnpm-lock.yaml`, `node_modules`, `.env.example`)를 작성한 뒤, 가짜 접속 문자열이 든 임시 파일에 `pnpm exec secretlint`가 실패하는지 확인한다
-- [ ] 2.4 `.husky/pre-commit`에 staged 파일만 secretlint로 검사하는 훅을 작성하고, 가짜 접속 문자열 파일을 stage해 커밋이 거부되는지·`.env.example`은 통과하는지 확인한다
+- [x] 2.4 `.husky/pre-commit`에 staged 파일만 secretlint로 검사하는 훅을 작성하고, 가짜 접속 문자열 파일을 stage해 커밋이 거부되는지·`.env.example`은 통과하는지 확인한다
 - [x] 2.5 `.claude/settings.json`에 `permissions.deny`로 `Read(./.env)`, `Read(./.env.local)`, `Read(./.env.*.local)`을 추가하고, CLAUDE.md에 "환경 파일은 열지 않는다" 규칙을 적은 뒤 JSON이 유효한지 확인한다
 
 ## 3. 타깃 스크립트와 로컬 Postgres
