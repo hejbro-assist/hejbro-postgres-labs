@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@fission-ai/openspec@1.12.0'
