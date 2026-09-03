@@ -2,6 +2,7 @@
  * provider 타깃을 이름으로 골라 hejbro 명령을 실행한다.
  *
  *   pnpm target <neon|nile|supabase|postgres> <migrate|status|check|reset> [hejbro 추가 인자]
+ *   pnpm target <neon|nile|supabase|postgres> sql "<statement>"   # 결과를 JSON 줄로 출력
  *   pnpm target doctor
  *
  * 접속 문자열은 자식 프로세스의 환경 변수(DATABASE_URL)로만 전달하고 argv에는
@@ -25,6 +26,7 @@ const HEJBRO_COMMANDS = ["migrate", "status", "check", "reset"] as const;
 type HejbroCommand = (typeof HEJBRO_COMMANDS)[number];
 
 const DOCTOR_COMMAND = "doctor";
+const SQL_COMMAND = "sql";
 const ENV_FILE = ".env";
 const SECURE_MODE = 0o600;
 const CONNECT_TIMEOUT_MILLISECONDS = 8000;
@@ -85,7 +87,7 @@ const warnEnvFilePermissions = (): void => {
 const printUsageAndExit = (message: string): never => {
 	console.error(message);
 	console.error(
-		`usage: pnpm target <${targetNames.join("|")}> <${HEJBRO_COMMANDS.join("|")}> [args]\n       pnpm target ${DOCTOR_COMMAND}`,
+		`usage: pnpm target <${targetNames.join("|")}> <${HEJBRO_COMMANDS.join("|")}> [args]\n       pnpm target <name> ${SQL_COMMAND} "<statement>"\n       pnpm target ${DOCTOR_COMMAND}`,
 	);
 	process.exit(1);
 };
@@ -174,6 +176,41 @@ const probe = async (target: TargetName): Promise<DoctorRow> => {
 	return { target, state: STATE_CONFIGURED, label: connection.label, result };
 };
 
+/** 타깃에 SQL 문 하나를 실행하고 결과 행을 JSON 줄로 출력한다. 오류 메시지도 마스킹한다. */
+const runSql = async (target: TargetName, statement: string): Promise<void> => {
+	warnEnvFilePermissions();
+	const connectionString = readConnectionOrExit(target);
+	const connection = parseConnection(connectionString);
+	if (connection === undefined) {
+		printUsageAndExit(`error: ${TARGET_VARIABLES[target]} 의 형식이 URL이 아닙니다. 값은 출력하지 않습니다.`);
+		return;
+	}
+	console.log(`target ${target} (${connection.label}) → sql`);
+	const client = new pg.Client({ connectionString, connectionTimeoutMillis: CONNECT_TIMEOUT_MILLISECONDS });
+	const exitCode = await client
+		.connect()
+		.then(() => client.query<Record<string, unknown>>(statement))
+		.then((result) => {
+			// 여러 문장을 보내면 pg 는 런타임에 결과 배열을 돌려준다. flat() 이 두 경우를 하나로 만든다.
+			const results = [result].flat();
+			results.forEach((single) => {
+				single.rows.forEach((row) => console.log(JSON.stringify(row)));
+				console.log(`(${single.rowCount ?? 0} rows, ${single.command})`);
+			});
+			return 0;
+		})
+		.catch((error: unknown) => {
+			if (error instanceof Error) {
+				console.error(`error: ${maskSecret(error.message, connection.password)}`);
+				return 1;
+			}
+			console.error("error: unknown");
+			return 1;
+		})
+		.finally(() => client.end().catch(() => undefined));
+	process.exit(exitCode);
+};
+
 const runDoctor = async (): Promise<void> => {
 	warnEnvFilePermissions();
 	const rows = await Promise.all(targetNames.map(probe));
@@ -190,6 +227,12 @@ if (firstArgument === DOCTOR_COMMAND) {
 	printUsageAndExit(
 		`error: 알 수 없는 타깃 '${firstArgument}'. 유효한 타깃: ${targetNames.join(", ")}`,
 	);
+} else if (secondArgument === SQL_COMMAND) {
+	const [statement = ""] = restArguments;
+	if (statement === "") {
+		printUsageAndExit("error: 실행할 SQL 문이 비어 있습니다.");
+	}
+	await runSql(firstArgument, statement);
 } else if (!isHejbroCommand(secondArgument)) {
 	printUsageAndExit(
 		`error: 알 수 없는 명령 '${secondArgument}'. 유효한 명령: ${HEJBRO_COMMANDS.join(", ")}`,
