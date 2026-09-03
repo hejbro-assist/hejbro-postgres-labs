@@ -124,9 +124,13 @@ const writeVariable = (variable: Variable, value: string): void => {
 
 const [variableArgument = "", modeArgument = ""] = process.argv.slice(2);
 
-if (!isVariable(variableArgument)) {
-	fail(`알 수 없는 변수 '${variableArgument}'`);
-}
+const resolveVariable = (value: string): Variable => {
+	if (isVariable(value)) {
+		return value;
+	}
+	return fail(`알 수 없는 변수 '${value}'`);
+};
+const variable = resolveVariable(variableArgument);
 const useStdin = modeArgument === STDIN_FLAG;
 const readInput = (): string => {
 	if (useStdin) {
@@ -139,8 +143,8 @@ if (raw === "") {
 	fail("입력이 비어 있습니다. 콘솔에서 접속 문자열을 복사한 뒤 다시 실행하세요.");
 }
 const connection = normalizeConnection(raw);
-writeVariable(variableArgument, connection.value);
-console.log(`${variableArgument} → ${connection.label}`);
+writeVariable(variable, connection.value);
+console.log(`${variable} → ${connection.label}`);
 if (!useStdin) {
 	clearClipboard();
 }
