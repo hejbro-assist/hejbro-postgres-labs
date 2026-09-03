@@ -37,7 +37,7 @@ The system SHALL provide a command that posts a finding to the hejbro repository
 The system SHALL scan the finding body for secret patterns before posting and MUST refuse to post when a connection string with a password or another secret pattern is present.
 
 #### Scenario: 접속 문자열이 본문에 있다
-- **WHEN** 본문에 `postgres://u:p@host/db`가 포함된 파일을 게시하려 한다
+- **WHEN** 본문에 비밀번호가 담긴 접속 문자열이 포함된 파일을 게시하려 한다
 - **THEN** 게시는 거부되고 문제 위치가 출력된다
 
 ### Requirement: 게시 계정

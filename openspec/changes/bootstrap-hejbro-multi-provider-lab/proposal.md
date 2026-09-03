@@ -31,7 +31,7 @@ hejbro(TypeScript 선언 → 결정적 마이그레이션 SQL)를 Neon, Nile, Su
 
 ## 검증 기준
 
-- `git log -p`, 작업 트리, CI 로그, 스크립트 출력 어디에서도 `postgres://…:<password>@` 형태가 없다. 가짜 접속 문자열을 커밋 시도하면 pre-commit이 거부한다.
+- `git log -p`, 작업 트리, CI 로그, 스크립트 출력 어디에서도 `<사용자>:<비밀번호>@<host>` 형태가 없다. 가짜 접속 문자열을 커밋 시도하면 pre-commit이 거부한다.
 - 네 타깃 각각에서 `migrate`가 exit 0, 이어지는 `check`가 exit 0(선언과 카탈로그 일치)을 반환한다.
 - `hejbro verify`가 로컬과 CI에서 통과한다.
 - 접속 정보가 없는 타깃을 지정하면 어떤 변수를 채워야 하는지 알려 주고 종료하며, 값은 출력하지 않는다.

@@ -13,13 +13,13 @@ The system SHALL keep every provider connection string only in a local environme
 
 #### Scenario: 예시 파일에는 placeholder만 있다
 - **WHEN** 커밋된 `.env.example`을 읽는다
-- **THEN** 모든 값은 `postgres://USER:PASSWORD@HOST/DB` 같은 placeholder이고, 실제 host·비밀번호는 없다
+- **THEN** 모든 값은 사용자명·비밀번호·host 자리에 `USER`, `PASSWORD`, `HOST` 같은 대문자 placeholder이고, 실제 host·비밀번호는 없다
 
 ### Requirement: 커밋 전에 비밀 패턴을 검사한다
 The system SHALL scan staged files before every commit and MUST refuse the commit when any staged content contains a connection string with an embedded password or another recognized secret pattern.
 
 #### Scenario: 접속 문자열이 든 파일의 커밋이 거부된다
-- **WHEN** `postgres://alice:s3cret@ep-x.neon.tech/db` 문자열이 포함된 파일을 stage하고 커밋한다
+- **WHEN** 사용자명 `alice`, 비밀번호 `s3cret`, host `ep-x.neon.tech`가 담긴 접속 문자열이 포함된 파일을 stage하고 커밋한다
 - **THEN** 커밋은 실패하고, 출력은 문제 파일과 줄 번호를 가리킨다
 
 #### Scenario: placeholder는 통과한다
