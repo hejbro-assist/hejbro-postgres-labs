@@ -1,5 +1,13 @@
 node_modules/
 .DS_Store
+
+# 환경 파일: 접속 정보는 .env에만 두고 절대 커밋하지 않는다
 .env
 .env.*
 !.env.example
+.env.local
+.env.*.local
+
+# 키/인증서
+*.pem
+*.key

@@ -1,0 +1,32 @@
+name: ci
+
+# DB 없이 끝나는 검사만 돌린다. provider 접속은 이 워크플로우의 범위 밖이다.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: type check
+        run: pnpm check-types
+      - name: hejbro verify (shared chain)
+        run: pnpm verify
+      - name: hejbro verify (provider preset gates)
+        run: pnpm verify:presets
+      - name: secret scan (whole repository)
+        run: pnpm exec secretlint "**/*"
+      - name: findings format
+        run: pnpm finding validate all
