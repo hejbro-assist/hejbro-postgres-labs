@@ -25,8 +25,8 @@
 
 - [x] 4.1 `src/lab.schema.ts`에 D9의 `lab` 스키마와 `projects` 테이블(CHECK, partial index 포함)을 선언하고 `pnpm exec hejbro generate --name add_lab`으로 `0001_add_lab.sql`이 생성되며 배너에 `tenant_id`가 포함되는지 확인한다
 - [x] 4.2 `tasks` 테이블(FK on delete cascade, status CHECK, 복합 인덱스)을 추가 선언하고 `pnpm exec hejbro generate --name add_tasks`로 `0002_add_tasks.sql`이 생성되는지 확인한다
-- [ ] 4.3 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(presets만 다름)를 만들고 `pnpm exec hejbro verify --config` 각각의 결과를 기록한다. 스냅샷 불일치로 실패하면 D2의 대체 게이트(`generate --config`의 오류 유무)로 바꾸고 그 사실을 finding 초안으로 남긴다
-- [ ] 4.4 `pnpm verify`(`hejbro verify`)가 통과하고 `pnpm check-types`가 통과하는지 확인한다
+- [x] 4.3 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(presets만 다름)를 만들고 `pnpm exec hejbro verify --config` 각각의 결과를 기록한다. 스냅샷 불일치로 실패하면 D2의 대체 게이트(`generate --config`의 오류 유무)로 바꾸고 그 사실을 finding 초안으로 남긴다
+- [x] 4.4 `pnpm verify`(`hejbro verify`)가 통과하고 `pnpm check-types`가 통과하는지 확인한다
 
 ## 5. 발견 사항 기록과 게시
 
@@ -47,7 +47,7 @@
 
 ## 8. 네 타깃 적용과 대조 (검증)
 
-- [ ] 8.1 `postgres` 타깃에 `migrate` → `check` → `migrate`(재실행)를 돌려 exit 0 / 0 / "nothing to apply"인지 확인하고 결과를 기록한다
+- [x] 8.1 `postgres` 타깃에 `migrate` → `check` → `migrate`(재실행)를 돌려 exit 0 / 0 / "nothing to apply"인지 확인하고 결과를 기록한다
 - [ ] 8.2 `nile` 타깃에 같은 순서를 돌린다. `lab` 스키마나 FK가 거부되면 D9의 리스크 절차(체인 리셋 후 `public`으로 재생성)를 따르고 finding을 작성한다
 - [ ] 8.3 `supabase` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [ ] 8.4 `neon` 타깃에 같은 순서를 돌리고 결과를 기록한다

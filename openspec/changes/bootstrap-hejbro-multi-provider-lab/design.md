@@ -86,6 +86,6 @@ gh 래퍼가 디렉터리 기준으로 계정을 바꾸므로 스크립트는 `g
 
 ## Open Questions
 
-- Nile preset을 등록한 설정으로 `verify`를 돌렸을 때 스냅샷 텍스트가 `presets: []`와 동일한가. 다르면 D2의 게이트를 `generate --config`의 오류 유무로 바꾼다. 어느 쪽이든 spec과 task 분해는 그대로다.
+- (해결됨 2026-09-03) Nile·Supabase preset을 등록한 설정으로 `verify`를 돌려도 스냅샷 텍스트가 `presets: []`와 동일했다. `pnpm verify:presets`가 게이트다.
 - Neon, Nile, Supabase의 현재 기본 Postgres 메이저 버전. 결과 표에 기록할 값이며 설계에는 영향이 없다.
 - `hejbro check`의 종료 코드 2(선언과 카탈로그 불일치 외의 사유)가 어떤 경우에 나오는가. 첫 실행에서 관찰해 결과 표에 적는다.
