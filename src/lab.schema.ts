@@ -10,7 +10,9 @@
  */
 import {
 	check,
+	inArray,
 	index,
+	integer,
 	isNull,
 	schema,
 	sql,
@@ -19,6 +21,9 @@ import {
 	timestamptz,
 	uuid,
 } from "hejbro";
+
+const TASK_STATUSES = ["todo", "doing", "done"] as const;
+const DEFAULT_TASK_STATUS = "todo";
 
 export const lab = schema("lab");
 
@@ -35,5 +40,34 @@ export const projects = table(
 	(t) => ({
 		indexes: [index().on(t.tenantId).where(isNull(t.archivedAt))],
 		checks: [check("projects_name_not_blank", sql`length(btrim(${t.name})) > 0`)],
+	}),
+);
+
+export const tasks = table(
+	lab,
+	"tasks",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		tenantId: uuid().notNull(),
+		projectId: uuid().notNull(),
+		title: text().notNull(),
+		status: text().notNull().default(DEFAULT_TASK_STATUS),
+		position: integer().notNull().default(0),
+		createdAt: timestamptz().notNull().defaultNow(),
+	},
+	(t) => ({
+		// onDelete가 필요하므로 column-level .references() 대신 extras.foreignKeys를 쓴다.
+		foreignKeys: [
+			{
+				columns: [t.projectId],
+				references: { table: projects, columns: [projects.id] },
+				onDelete: "cascade",
+			},
+		],
+		indexes: [index().on(t.tenantId, t.status)],
+		checks: [
+			check("tasks_title_not_blank", sql`length(btrim(${t.title})) > 0`),
+			check("tasks_status_allowed", inArray(t.status, [...TASK_STATUSES])),
+		],
 	}),
 );

@@ -24,7 +24,7 @@
 ## 4. portable core 스키마
 
 - [x] 4.1 `src/lab.schema.ts`에 D9의 `lab` 스키마와 `projects` 테이블(CHECK, partial index 포함)을 선언하고 `pnpm exec hejbro generate --name add_lab`으로 `0001_add_lab.sql`이 생성되며 배너에 `tenant_id`가 포함되는지 확인한다
-- [ ] 4.2 `tasks` 테이블(FK on delete cascade, status CHECK, 복합 인덱스)을 추가 선언하고 `pnpm exec hejbro generate --name add_tasks`로 `0002_add_tasks.sql`이 생성되는지 확인한다
+- [x] 4.2 `tasks` 테이블(FK on delete cascade, status CHECK, 복합 인덱스)을 추가 선언하고 `pnpm exec hejbro generate --name add_tasks`로 `0002_add_tasks.sql`이 생성되는지 확인한다
 - [ ] 4.3 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(presets만 다름)를 만들고 `pnpm exec hejbro verify --config` 각각의 결과를 기록한다. 스냅샷 불일치로 실패하면 D2의 대체 게이트(`generate --config`의 오류 유무)로 바꾸고 그 사실을 finding 초안으로 남긴다
 - [ ] 4.4 `pnpm verify`(`hejbro verify`)가 통과하고 `pnpm check-types`가 통과하는지 확인한다
 

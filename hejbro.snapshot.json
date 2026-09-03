@@ -106,6 +106,178 @@
 			"name": "projects",
 			"primaryKeyName": "projects_pkey",
 			"schema": "lab"
+		},
+		"table:lab.tasks": {
+			"checks": [
+				{
+					"expression": {
+						"chunks": [
+							{
+								"chunkKind": "text",
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "title",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "tasks"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
+							}
+						],
+						"nodeKind": "sql-template"
+					},
+					"name": "tasks_title_not_blank"
+				},
+				{
+					"expression": {
+						"negated": false,
+						"nodeKind": "in-list",
+						"operand": {
+							"column": "status",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "tasks"
+						},
+						"values": [
+							{
+								"literal": {
+									"literalKind": "string",
+									"value": "todo"
+								},
+								"nodeKind": "literal"
+							},
+							{
+								"literal": {
+									"literalKind": "string",
+									"value": "doing"
+								},
+								"nodeKind": "literal"
+							},
+							{
+								"literal": {
+									"literalKind": "string",
+									"value": "done"
+								},
+								"nodeKind": "literal"
+							}
+						]
+					},
+					"name": "tasks_status_allowed"
+				}
+			],
+			"columns": [
+				{
+					"default": {
+						"args": [],
+						"function": "gen_random_uuid",
+						"nodeKind": "function-call",
+						"schema": null
+					},
+					"name": "id",
+					"notNull": true,
+					"primaryKey": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
+				{
+					"name": "tenant_id",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
+				{
+					"name": "project_id",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
+				{
+					"name": "title",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "text"
+					}
+				},
+				{
+					"default": {
+						"literal": {
+							"literalKind": "string",
+							"value": "todo"
+						},
+						"nodeKind": "literal"
+					},
+					"name": "status",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "text"
+					}
+				},
+				{
+					"default": {
+						"literal": {
+							"literalKind": "number",
+							"value": 0
+						},
+						"nodeKind": "literal"
+					},
+					"name": "position",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "integer"
+					}
+				},
+				{
+					"default": {
+						"args": [],
+						"function": "now",
+						"nodeKind": "function-call",
+						"schema": null
+					},
+					"name": "created_at",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "timestamptz"
+					}
+				}
+			],
+			"foreignKeys": [
+				{
+					"columns": [
+						"project_id"
+					],
+					"name": "tasks_project_id_fk",
+					"onDelete": "cascade",
+					"referencesColumns": [
+						"id"
+					],
+					"referencesTable": "lab.projects"
+				}
+			],
+			"indexes": [
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						},
+						{
+							"name": "status"
+						}
+					],
+					"name": "tasks_tenant_id_status_idx"
+				}
+			],
+			"name": "tasks",
+			"primaryKeyName": "tasks_pkey",
+			"schema": "lab"
 		}
 	}
 }
