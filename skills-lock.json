@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "hejbro": {
+      "source": "quickstart-now/hejbro",
+      "sourceType": "github",
+      "skillPath": "skills/hejbro/SKILL.md",
+      "computedHash": "79808a0d51b2a83aed463f7d150d5457c43ec3020627bb295aa07963824a36b9"
+    }
+  }
+}
