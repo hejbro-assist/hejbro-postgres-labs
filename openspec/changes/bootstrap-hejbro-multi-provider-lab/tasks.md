@@ -42,7 +42,7 @@
 ## 7. provider 준비 (사용자 작업)
 
 - [x] 7.1 사용자가 Neon 프로젝트를 만들고 direct(non-pooled) 접속 문자열을 `.env`의 `NEON_DATABASE_URL`에 넣는다. `pnpm target doctor`에서 `neon`이 연결 성공으로 표시되는지 확인한다
-- [ ] 7.2 사용자가 Nile 데이터베이스를 만들고 접속 문자열을 `NILE_DATABASE_URL`에 넣는다. `doctor`에서 `nile`이 연결 성공인지 확인한다
+- [x] 7.2 사용자가 Nile 데이터베이스를 만들고 접속 문자열을 `NILE_DATABASE_URL`에 넣는다. `doctor`에서 `nile`이 연결 성공인지 확인한다
 - [ ] 7.3 사용자가 Supabase 프로젝트를 만들고 direct 또는 session pooler(5432) 접속 문자열을 `SUPABASE_DATABASE_URL`에 넣는다. `doctor`에서 `supabase`가 연결 성공인지 확인한다
 
 ## 8. 네 타깃 적용과 대조 (검증)

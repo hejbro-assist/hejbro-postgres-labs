@@ -12,11 +12,18 @@ The system SHALL declare the sample schema using only object kinds every target 
 - **THEN** `nile-rls-unsupported`나 `nile-function-unsupported` 오류 없이 성공한다
 
 ### Requirement: 테넌트 열을 갖는다
-The system SHALL give every sample table a `tenant_id uuid NOT NULL` column so that Nile treats the table as tenant-aware and the other providers treat it as an ordinary column.
+The system SHALL give every sample table a `tenant_id uuid NOT NULL` column so that Nile treats the table as tenant-aware and the other providers treat it as an ordinary column, and SHALL include `tenant_id` in every sample table's primary key and in every foreign key that references a sample table.
 
 #### Scenario: 테이블 정의
 - **WHEN** 생성된 마이그레이션 SQL을 읽는다
-- **THEN** 모든 `create table` 문에 `"tenant_id" uuid not null`이 포함된다
+- **THEN** 모든 `create table` 문에 `"tenant_id" uuid not null`이 포함되고, 모든 primary key 제약이 `"tenant_id"`로 시작한다
+
+### Requirement: 제약 식은 열을 한정하지 않는다
+The system SHALL render CHECK constraint expressions and partial index predicates without schema- or table-qualified column references, because Nile rejects qualified references on tenant-aware tables.
+
+#### Scenario: CHECK 렌더링
+- **WHEN** 생성된 마이그레이션 SQL의 `check (...)`와 `where ...` 절을 읽는다
+- **THEN** `"lab"."projects"."name"` 같은 한정 참조가 없고 열 이름만 나타난다
 
 ### Requirement: 마이그레이션 체인은 파일 검증을 통과한다
 The system SHALL keep `hejbro verify` passing on the committed declarations, migrations, and snapshot.
