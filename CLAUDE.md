@@ -18,3 +18,10 @@ Postgres 실험(labs) 저장소. OpenSpec 기반 spec-driven 워크플로우를 
 - 브랜치: feature → PR → `dev` (squash merge) → `main` (merge commit)
 - 커밋: conventional commits, subject 전부 소문자. husky + commitlint가 강제한다.
 - 패키지 매니저: pnpm
+
+## credential 규칙
+
+- 접속 정보는 `.env`에만 둔다. `.env.example`만 커밋한다.
+- **환경 파일(`.env`, `.env.local`, `.env.*.local`)은 어떤 도구로도 열지 않는다.** Read 도구는 `.claude/settings.json`이 막고, Bash에서도 `cat`·`grep` 등으로 읽지 않는다. 설정 여부는 `pnpm target doctor`로만 확인한다.
+- 스크립트 출력에 접속 문자열을 찍지 않는다. 타깃은 이름과 host로만 식별한다.
+- 커밋 전 secretlint(pre-commit)와 CI 전체 스캔이 비밀 패턴을 막는다. `--no-verify`로 우회하지 않는다.
