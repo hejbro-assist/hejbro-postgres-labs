@@ -17,7 +17,7 @@ Postgres 실험(labs) 저장소. OpenSpec 기반 spec-driven 워크플로우를 
 - 원격: `origin` = `hejbro-assist/hejbro-postgres-labs` (계정 hejbro-assist)
 - 브랜치: feature → PR → `dev` (squash merge) → `main` (merge commit)
 - 커밋: conventional commits, subject 전부 소문자. husky + commitlint가 강제한다.
-- 패키지 매니저: pnpm
+- 패키지 매니저: pnpm. Node는 22.18 이상(hejbro의 engines와 동일). 스크립트는 `.ts`를 Node가 직접 실행한다(빌드 없음).
 
 ## credential 규칙
 
