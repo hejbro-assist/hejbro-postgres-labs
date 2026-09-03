@@ -16,10 +16,10 @@ context: |
 rules:
   proposal:
     - 500단어 이내로 유지한다
-    - "Non-goals" 섹션을 반드시 포함한다
+    - Non-goals 섹션을 반드시 포함한다
     - 실험 목적이면 검증 기준(무엇을 측정해서 무엇을 결론 내릴지)을 명시한다
   specs:
-    - 요구사항은 "The system SHALL ..." 형식으로 쓴다
+    - 요구사항은 The system SHALL ... 형식으로 쓴다
     - 각 요구사항에 최소 하나의 Scenario를 둔다
   design:
     - Postgres 버전과 사용하는 extension을 명시한다
