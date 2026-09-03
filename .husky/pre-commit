@@ -1,0 +1,4 @@
+# staged 파일만 secretlint로 검사한다. 삭제된 파일은 제외.
+files=$(git diff --cached --name-only --diff-filter=ACMR -z | tr '\0' '\n')
+[ -z "$files" ] && exit 0
+printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 pnpm exec secretlint
