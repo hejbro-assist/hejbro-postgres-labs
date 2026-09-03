@@ -37,7 +37,7 @@
 ## 6. CI
 
 - [x] 6.1 `.github/workflows/ci.yml`을 작성한다(push main/dev, pull_request, Node 24, pnpm frozen install, `check-types`, `verify`, `secretlint "**/*"`, `finding validate all`). 워크플로우 파일이 `actionlint` 또는 `gh workflow view`로 문법 오류 없이 인식되는지 확인한다
-- [ ] 6.2 feature 브랜치를 push해 PR을 만들고 CI 네 단계가 모두 통과하는지 확인한다
+- [x] 6.2 feature 브랜치를 push해 PR을 만들고 CI 네 단계가 모두 통과하는지 확인한다
 
 ## 7. provider 준비 (사용자 작업)
 
@@ -52,9 +52,9 @@
 - [ ] 8.3 `supabase` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [ ] 8.4 `neon` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [ ] 8.5 `RESULTS.md`에 네 행(타깃, hejbro 버전, Postgres 버전, migrate/check 결과, 비고)을 작성하고 커밋한다
-- [ ] 8.6 `git log -p`와 CI 로그에서 `://[^/]*:[^@]*@` 패턴을 grep해 접속 문자열이 한 건도 없는지 확인한다
+- [x] 8.6 `git log -p`와 CI 로그에서 `://[^/]*:[^@]*@` 패턴을 grep해 접속 문자열이 한 건도 없는지 확인한다
 
 ## 9. 첫 피드백
 
-- [ ] 9.1 8단계에서 나온 발견 사항 중 최소 한 건을 `findings/`에 작성하고 `pnpm finding validate`가 통과하는지 확인한다
-- [ ] 9.2 `pnpm finding post`로 게시하고 discussion 작성자가 `hejbro-assist`인지, 파일에 URL이 기록되었는지 확인한다
+- [x] 9.1 8단계에서 나온 발견 사항 중 최소 한 건을 `findings/`에 작성하고 `pnpm finding validate`가 통과하는지 확인한다
+- [x] 9.2 `pnpm finding post`로 게시하고 discussion 작성자가 `hejbro-assist`인지, 파일에 URL이 기록되었는지 확인한다
