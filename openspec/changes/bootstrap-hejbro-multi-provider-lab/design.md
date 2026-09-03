@@ -29,7 +29,7 @@
 
 ### D2. 단일 패키지, 단일 체인, 공유 설정은 `presets: []`
 `hejbro.config.ts`는 `entry: ["src/lab.schema.ts"]`, `migrationsDir: "migrations"`, `snapshotPath: "hejbro.snapshot.json"`, `prefixStrategy: "index"`, `presets: []`로 둔다. 대안으로 provider별 패키지 네 개(체인 네 개)를 검토했으나 "같은 선언을 어디에나"라는 실험 목적과 어긋나고 스키마가 네 벌로 갈라진다.
-Nile·Supabase preset은 별도 설정 파일 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(entry·migrations·snapshot은 같고 `presets`만 다름)로 두고, `hejbro verify --config <file>`을 "이 선언이 그 provider의 검증을 통과하는가"를 묻는 게이트로만 쓴다. preset이 스냅샷 텍스트를 바꿔 verify가 실패하면 그 사실 자체를 finding으로 기록하고 게이트는 `generate --config`의 오류 유무로 대체한다(Open Questions 참고).
+Nile·Supabase preset은 별도 설정 파일 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(entry·migrations·snapshot은 같고 `presets`만 다름)로 둔다. 게이트는 `scripts/preset-gate.sh`(`pnpm gate:presets`)가 각 설정으로 `hejbro generate`를 실행해 검증기 오류가 없고 아무 파일도 쓰지 않았음을 확인하는 방식이다. 처음 계획한 `verify --config`는 preset 검증기를 실행하지 않아 게이트가 되지 못했다(2026-09-03 확인, findings/2026-09-03-verify-skips-preset-validators.md).
 
 ### D3. 타깃 스크립트는 환경 변수를 자식 프로세스 env로만 넘긴다
 `scripts/target.ts <target> <migrate|status|check|doctor>`가 타깃 이름을 환경 변수 이름으로 매핑하고, `DATABASE_URL`을 자식 프로세스의 env에 넣어 `hejbro <cmd>`를 spawn한다. `--url` 플래그는 쓰지 않는다. argv는 `ps`와 셸 히스토리에 남지만 env는 그렇지 않기 때문이다. 스크립트는 TypeScript(`.ts`)로 쓰고 Node 24의 내장 타입 스트리핑으로 직접 실행한다(빌드 단계 없음, 하우스 룰 적용 대상). `.env` 로딩은 `node --env-file-if-exists=.env`로 하고 dotenv 의존성을 추가하지 않는다. `.env`가 없으면 Node가 실패하므로 `package.json` 스크립트는 `--env-file-if-exists=.env`를 쓴다(Node 22.9+).
@@ -48,14 +48,16 @@ compose 플러그인이 없으므로 `scripts/local-pg.sh up|down|logs`가 `post
 
 ### D8. provider 접속 경로
 - Neon: 콘솔의 direct(non-pooled) 접속 문자열. pooled 엔드포인트는 PgBouncer transaction 모드라 `migrate`에 부적합하다.
-- Supabase: direct 접속 또는 session-mode pooler(5432). transaction-mode(6543) 금지.
+- Supabase: session-mode pooler(5432). direct 주소는 IPv6 전용이라 IPv6가 없는 WSL에서 닿지 않았다(2026-09-03). pooler 인증서는 Supabase 자체 CA(`certs/supabase-prod-ca-2021.crt`, 공개 인증서라 커밋)로 서명되어 `sslrootcert`를 접속 문자열에 붙인다. 검증을 끄는 `uselibpqcompat`는 쓰지 않는다. transaction-mode(6543) 금지.
 - Nile: 콘솔의 표준 5432 접속 문자열.
 - 세 provider 모두 `sslmode=require`가 문자열에 포함되어야 한다. 스크립트는 host가 `localhost`가 아닌데 `sslmode`가 없으면 경고한다.
 
 ### D9. 샘플 스키마와 마이그레이션 분할
 스키마 이름은 `lab`. 마이그레이션은 두 파일로 나눈다.
-- `0001_add_lab`: `lab` 스키마와 `lab.projects(id uuid pk default gen_random_uuid(), tenant_id uuid not null, name text not null, archived_at timestamptz, created_at timestamptz not null default now())`, CHECK `length(name) > 0`, partial index `projects(tenant_id) where archived_at is null`.
-- `0002_add_tasks`: `lab.tasks(id, tenant_id uuid not null, project_id uuid not null references lab.projects(id) on delete cascade, title text not null, status text not null default 'todo', position integer not null default 0, created_at)`, CHECK `status in ('todo','doing','done')`, 복합 인덱스 `tasks(tenant_id, status)`.
+- `0001_add_lab`: `lab` 스키마와 `lab.projects(tenant_id uuid, id uuid default gen_random_uuid(), name text not null, archived_at timestamptz, created_at timestamptz not null default now(), primary key (tenant_id, id))`, CHECK `length(btrim(name)) > 0`, partial index `projects(tenant_id) where archived_at is null`.
+- `0002_add_tasks`: `lab.tasks(tenant_id, id, project_id uuid not null, title text not null, status text not null default 'todo', position integer not null default 0, created_at, primary key (tenant_id, id), foreign key (tenant_id, project_id) references lab.projects(tenant_id, id) on delete cascade)`, CHECK `status in ('todo','doing','done')`, 복합 인덱스 `tasks(tenant_id, status)`.
+- PK와 FK가 `tenant_id`를 포함하는 이유: Nile은 tenant-aware 테이블의 PK에 `tenant_id`가 없으면 거부한다(42P17). 두 열에 `.primaryKey()`를 붙이면 hejbro가 복합 PK를 렌더링한다.
+- CHECK와 partial index 술어는 열을 보간하지 않는 raw `sql` 템플릿으로 쓴다. hejbro가 열 참조를 3단계(`"lab"."projects"."name"`)로 렌더링하면 Nile이 42622로 거부하기 때문이다(findings/2026-09-03-nile-rejects-qualified-column-refs.md). 대가로 rename 추적을 잃는다.
 `tenants` 테이블은 선언하지 않는다. Nile은 내장 `public.tenants`를 갖고 있어 충돌하고, 다른 provider에서는 실험 목적상 필요 없다. 두 단계로 나누는 이유는 "체인이 두 개 이상일 때 ledger가 순서를 지키는가"를 네 타깃에서 확인하기 위해서다.
 
 ### D10. 발견 사항 파일과 게시 스크립트
@@ -86,6 +88,6 @@ gh 래퍼가 디렉터리 기준으로 계정을 바꾸므로 스크립트는 `g
 
 ## Open Questions
 
-- (해결됨 2026-09-03) Nile·Supabase preset을 등록한 설정으로 `verify`를 돌려도 스냅샷 텍스트가 `presets: []`와 동일했다. `pnpm verify:presets`가 게이트다.
+- (해결됨 2026-09-03) preset을 등록한 설정으로 `verify`는 통과하지만 preset 검증기를 실행하지 않는다. 게이트는 `pnpm gate:presets`(generate 기반)로 바꿨다.
 - Neon, Nile, Supabase의 현재 기본 Postgres 메이저 버전. 결과 표에 기록할 값이며 설계에는 영향이 없다.
-- `hejbro check`의 종료 코드 2(선언과 카탈로그 불일치 외의 사유)가 어떤 경우에 나오는가. 첫 실행에서 관찰해 결과 표에 적는다.
+- (관찰됨 2026-09-03) `hejbro check` exit 2는 "비교 불가"다. Nile에서 CHECK 제약 비교에 쓰는 EXPLAIN의 command tag를 hejbro가 처리하지 못해 CHECK 3건이 비교 불가였다. 그래서 Nile은 spec의 "check exit 0"을 hejbro 수정 전에는 만족할 수 없다. 결정 필요: Nile은 exit 2를 문서화된 예외로 둘지, portable core에서 CHECK를 뺄지.

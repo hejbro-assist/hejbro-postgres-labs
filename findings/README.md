@@ -15,7 +15,7 @@ hejbro를 써 보며 발견한 버그, 개선점, 기능 요청, 질문, 적용 
 | `provider` | `neon` `nile` `supabase` `postgres` `all` | 어느 타깃에서 발견했는지 |
 | `kind` | `bug` `improvement` `feature` `question` `showcase` | 분류. 아래 카테고리 대응을 결정한다 |
 | `status` | `draft` `posted` `resolved` | `post`가 `posted`로 바꾼다 |
-| `discussion` | URL 또는 빈 값 | `post`가 채운다. 값이 있으면 다시 게시하지 않는다 |
+| `discussion` | URL 또는 빈 값 | 게시된 Discussion 또는 Issue 의 URL. `post`가 채우며, 값이 있으면 다시 게시하지 않는다 |
 
 `bug`와 `improvement`는 본문에 `## 재현 절차`, `## 기대 결과`, `## 실제 결과` 섹션이 있어야 한다.
 
@@ -36,3 +36,7 @@ pnpm finding post findings/2026-09-03-example.md       # Discussions에 게시 (
 ```
 
 `post`는 게시 전에 secretlint로 본문을 검사하고, 접속 문자열 같은 비밀이 있으면 거부한다. 본문에는 host 이름도 적지 않는 것을 권장한다.
+
+## Issue 로 묶어 올린 경우
+
+hejbro 저장소 규칙(AGENTS.md)상 GitHub 에 올리는 글은 영어다. 2026-09-03 의 5건은 하나의 이슈로 묶어 영어로 올렸고, 각 파일의 `discussion` 에 그 이슈 URL 을 적었다.

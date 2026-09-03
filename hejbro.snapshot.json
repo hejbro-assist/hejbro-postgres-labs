@@ -12,20 +12,7 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim("
-							},
-							{
-								"chunkKind": "expr",
-								"expr": {
-									"column": "name",
-									"nodeKind": "column-ref",
-									"schema": "lab",
-									"table": "projects"
-								}
-							},
-							{
-								"chunkKind": "text",
-								"text": ")) > 0"
+								"text": "length(btrim(name)) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -34,6 +21,14 @@
 				}
 			],
 			"columns": [
+				{
+					"name": "tenant_id",
+					"notNull": true,
+					"primaryKey": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
 				{
 					"default": {
 						"args": [],
@@ -44,13 +39,6 @@
 					"name": "id",
 					"notNull": true,
 					"primaryKey": true,
-					"typeNode": {
-						"typeName": "uuid"
-					}
-				},
-				{
-					"name": "tenant_id",
-					"notNull": true,
 					"typeNode": {
 						"typeName": "uuid"
 					}
@@ -92,14 +80,13 @@
 					],
 					"name": "projects_tenant_id_idx",
 					"where": {
-						"negated": false,
-						"nodeKind": "null-test",
-						"operand": {
-							"column": "archived_at",
-							"nodeKind": "column-ref",
-							"schema": "lab",
-							"table": "projects"
-						}
+						"chunks": [
+							{
+								"chunkKind": "text",
+								"text": "archived_at is null"
+							}
+						],
+						"nodeKind": "sql-template"
 					}
 				}
 			],
@@ -114,20 +101,7 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim("
-							},
-							{
-								"chunkKind": "expr",
-								"expr": {
-									"column": "title",
-									"nodeKind": "column-ref",
-									"schema": "lab",
-									"table": "tasks"
-								}
-							},
-							{
-								"chunkKind": "text",
-								"text": ")) > 0"
+								"text": "length(btrim(title)) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -136,42 +110,37 @@
 				},
 				{
 					"expression": {
-						"negated": false,
-						"nodeKind": "in-list",
-						"operand": {
-							"column": "status",
-							"nodeKind": "column-ref",
-							"schema": "lab",
-							"table": "tasks"
-						},
-						"values": [
+						"chunks": [
 							{
-								"literal": {
-									"literalKind": "string",
-									"value": "todo"
-								},
-								"nodeKind": "literal"
+								"chunkKind": "text",
+								"text": "status in ("
 							},
 							{
-								"literal": {
-									"literalKind": "string",
-									"value": "doing"
-								},
-								"nodeKind": "literal"
+								"chunkKind": "expr",
+								"expr": {
+									"nodeKind": "raw-sql",
+									"sql": "'todo', 'doing', 'done'"
+								}
 							},
 							{
-								"literal": {
-									"literalKind": "string",
-									"value": "done"
-								},
-								"nodeKind": "literal"
+								"chunkKind": "text",
+								"text": ")"
 							}
-						]
+						],
+						"nodeKind": "sql-template"
 					},
 					"name": "tasks_status_allowed"
 				}
 			],
 			"columns": [
+				{
+					"name": "tenant_id",
+					"notNull": true,
+					"primaryKey": true,
+					"typeNode": {
+						"typeName": "uuid"
+					}
+				},
 				{
 					"default": {
 						"args": [],
@@ -182,13 +151,6 @@
 					"name": "id",
 					"notNull": true,
 					"primaryKey": true,
-					"typeNode": {
-						"typeName": "uuid"
-					}
-				},
-				{
-					"name": "tenant_id",
-					"notNull": true,
 					"typeNode": {
 						"typeName": "uuid"
 					}
@@ -252,11 +214,13 @@
 			"foreignKeys": [
 				{
 					"columns": [
+						"tenant_id",
 						"project_id"
 					],
-					"name": "tasks_project_id_fk",
+					"name": "tasks_tenant_id_project_id_fk",
 					"onDelete": "cascade",
 					"referencesColumns": [
+						"tenant_id",
 						"id"
 					],
 					"referencesTable": "lab.projects"
