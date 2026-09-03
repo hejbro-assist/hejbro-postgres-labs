@@ -30,13 +30,13 @@
 
 ## 5. 발견 사항 기록과 게시
 
-- [ ] 5.1 `findings/_template.md`와 `findings/README.md`(필드 설명, kind→카테고리 대응표)를 작성한다
-- [ ] 5.2 `scripts/finding.ts validate <file|all>`을 구현하고(frontmatter 필수 필드, `kind`·`provider` 허용값, bug/improvement의 세 섹션) 유효한 파일은 exit 0, `hejbro_version` 누락 파일은 필드 이름과 함께 exit 1인지 확인한다
-- [ ] 5.3 `scripts/finding.ts post <file>`을 구현한다(secretlint 사전 검사, `gh api user`로 `hejbro-assist` 확인, GraphQL로 repository·category id 조회 후 `createDiscussion`, URL을 frontmatter에 기록, URL이 있으면 거부). 접속 문자열이 든 파일로 실행해 거부되는지, `discussion`이 채워진 파일로 실행해 중복 생성이 없는지 확인한다
+- [x] 5.1 `findings/_template.md`와 `findings/README.md`(필드 설명, kind→카테고리 대응표)를 작성한다
+- [x] 5.2 `scripts/finding.ts validate <file|all>`을 구현하고(frontmatter 필수 필드, `kind`·`provider` 허용값, bug/improvement의 세 섹션) 유효한 파일은 exit 0, `hejbro_version` 누락 파일은 필드 이름과 함께 exit 1인지 확인한다
+- [x] 5.3 `scripts/finding.ts post <file>`을 구현한다(secretlint 사전 검사, `gh api user`로 `hejbro-assist` 확인, GraphQL로 repository·category id 조회 후 `createDiscussion`, URL을 frontmatter에 기록, URL이 있으면 거부). 접속 문자열이 든 파일로 실행해 거부되는지, `discussion`이 채워진 파일로 실행해 중복 생성이 없는지 확인한다
 
 ## 6. CI
 
-- [ ] 6.1 `.github/workflows/ci.yml`을 작성한다(push main/dev, pull_request, Node 24, pnpm frozen install, `check-types`, `verify`, `secretlint "**/*"`, `finding validate all`). 워크플로우 파일이 `actionlint` 또는 `gh workflow view`로 문법 오류 없이 인식되는지 확인한다
+- [x] 6.1 `.github/workflows/ci.yml`을 작성한다(push main/dev, pull_request, Node 24, pnpm frozen install, `check-types`, `verify`, `secretlint "**/*"`, `finding validate all`). 워크플로우 파일이 `actionlint` 또는 `gh workflow view`로 문법 오류 없이 인식되는지 확인한다
 - [ ] 6.2 feature 브랜치를 push해 PR을 만들고 CI 네 단계가 모두 통과하는지 확인한다
 
 ## 7. provider 준비 (사용자 작업)
