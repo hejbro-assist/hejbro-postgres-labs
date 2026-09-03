@@ -3,8 +3,8 @@ title: npx skills add quickstart-now/hejbro 가 저장소 내부 .claude/skills 
 hejbro_version: 0.2.0-pre.0
 provider: all
 kind: improvement
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/750
 ---
 
 ## 요약
