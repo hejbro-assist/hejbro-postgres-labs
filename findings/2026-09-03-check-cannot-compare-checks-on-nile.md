@@ -3,8 +3,8 @@ title: Nile 은 EXPLAIN 을 지원하지 않아 hejbro check 가 CHECK 제약을
 hejbro_version: 0.2.0-pre.0
 provider: nile
 kind: improvement
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/750
 ---
 
 ## 요약

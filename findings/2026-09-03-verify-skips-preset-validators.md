@@ -3,8 +3,8 @@ title: hejbro verify --config 는 preset 검증기를 돌리지 않아 provider 
 hejbro_version: 0.2.0-pre.0
 provider: nile
 kind: improvement
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/750
 ---
 
 ## 요약

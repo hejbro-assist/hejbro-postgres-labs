@@ -3,8 +3,8 @@ title: hejbro reset 이 FK 로 참조되는 테이블을 먼저 드롭하려다 
 hejbro_version: 0.2.0-pre.0
 provider: all
 kind: bug
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/750
 ---
 
 ## 요약

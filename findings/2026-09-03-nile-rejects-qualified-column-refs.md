@@ -3,8 +3,8 @@ title: CHECK 와 partial index 술어의 3단계 열 참조("schema"."table"."co
 hejbro_version: 0.2.0-pre.0
 provider: nile
 kind: bug
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/750
 ---
 
 ## 요약
