@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Language: ko
+  All artifacts must be written in ko.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Project: hejbro-postgres-labs
+  Postgres 실험(labs) 저장소. 스키마 설계, 쿼리 성능, 확장(extension), 마이그레이션 등을
+  주제별로 실험하고 결과를 spec으로 남긴다.
+  - 저장소: https://github.com/hejbro-assist/hejbro-postgres-labs (계정 hejbro-assist)
+  - 브랜치 흐름: feature 브랜치 → PR → dev (squash merge) → main (merge commit)
+  - 커밋: conventional commits, subject는 전부 소문자 (commitlint + husky 강제)
+  - 변경(change) 이름과 spec 디렉터리는 kebab-case 영문으로 짓는다.
+
+rules:
+  proposal:
+    - 500단어 이내로 유지한다
+    - "Non-goals" 섹션을 반드시 포함한다
+    - 실험 목적이면 검증 기준(무엇을 측정해서 무엇을 결론 내릴지)을 명시한다
+  specs:
+    - 요구사항은 "The system SHALL ..." 형식으로 쓴다
+    - 각 요구사항에 최소 하나의 Scenario를 둔다
+  design:
+    - Postgres 버전과 사용하는 extension을 명시한다
+    - 스키마 변경은 마이그레이션 파일 단위로 나눈다
+  tasks:
+    - 한 task는 2시간 이내로 끝나는 크기로 쪼갠다
+    - 검증(테스트/측정) task를 구현 task와 분리한다
+
+operations:
+  apply:
+    guidance:
+      - task 하나를 끝낼 때마다 tasks.md의 체크박스를 갱신한다
+      - 커밋은 task 단위로 나누고 conventional commit 형식을 지킨다
+  archive:
+    guidance:
+      - 아카이브 전에 실험 결과와 결론을 proposal 하단에 요약한다
