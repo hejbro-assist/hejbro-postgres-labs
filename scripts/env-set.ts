@@ -3,6 +3,8 @@
  *
  *   pnpm env:set NEON_DATABASE_URL          # 클립보드에서 읽는다 (WSL: Windows 클립보드)
  *   pnpm env:set NEON_DATABASE_URL --stdin  # 표준 입력에서 읽는다
+ *   pnpm env:set SUPABASE_DATABASE_URL --set-param sslrootcert=certs/supabase-prod-ca-2021.crt
+ *                                            # 이미 저장된 값에 쿼리 파라미터만 추가/교체한다
  *
  * 기록 후 클립보드를 비우고, 화면에는 host 와 DB 이름만 출력한다.
  */
@@ -23,6 +25,7 @@ const LOCAL_HOSTS = ["localhost", "127.0.0.1"] as const;
 const SSL_MODE_PARAMETER = "sslmode";
 const SSL_MODE_REQUIRED = "require";
 const STDIN_FLAG = "--stdin";
+const SET_PARAM_FLAG = "--set-param";
 const SECURE_MODE = 0o600;
 const ENV_FILE = process.env["ENV_FILE"] ?? ".env";
 
@@ -31,7 +34,7 @@ const isVariable = (value: string): value is Variable =>
 
 const fail = (message: string): never => {
 	console.error(`error: ${message}`);
-	console.error(`usage: pnpm env:set <${ALLOWED_VARIABLES.join("|")}> [${STDIN_FLAG}]`);
+	console.error(`usage: pnpm env:set <${ALLOWED_VARIABLES.join("|")}> [${STDIN_FLAG} | ${SET_PARAM_FLAG} key=value]`);
 	process.exit(1);
 };
 
@@ -102,6 +105,24 @@ const normalizeConnection = (raw: string): { readonly value: string; readonly la
 	return { value: parsed.toString(), label: `${parsed.hostname}${parsed.pathname}` };
 };
 
+/** 저장된 값을 읽어 쿼리 파라미터 하나를 추가/교체한다. 값은 어디에도 출력하지 않는다. */
+const setParameter = (variable: Variable, assignment: string): { readonly value: string; readonly label: string } => {
+	const separator = assignment.indexOf("=");
+	if (separator === -1) {
+		return fail(`${SET_PARAM_FLAG} 값은 key=value 형식이어야 합니다.`);
+	}
+	const key = assignment.slice(0, separator);
+	const parameterValue = assignment.slice(separator + 1);
+	const currentLine = readCurrentLines().find((line) => line.startsWith(`${variable}=`));
+	if (currentLine === undefined) {
+		return fail(`${ENV_FILE} 에 ${variable} 이 없습니다. 먼저 클립보드로 값을 넣으세요.`);
+	}
+	const parsed = new URL(currentLine.slice(variable.length + 1));
+	parsed.searchParams.set(key, parameterValue);
+	console.log(`${key} 파라미터를 설정했습니다.`);
+	return { value: parsed.toString(), label: `${parsed.hostname}${parsed.pathname}` };
+};
+
 const readCurrentLines = (): ReadonlyArray<string> => {
 	if (!existsSync(ENV_FILE)) {
 		return [];
@@ -131,20 +152,28 @@ const resolveVariable = (value: string): Variable => {
 	return fail(`알 수 없는 변수 '${value}'`);
 };
 const variable = resolveVariable(variableArgument);
+const [, , , , assignmentArgument = ""] = process.argv;
 const useStdin = modeArgument === STDIN_FLAG;
+const useSetParam = modeArgument === SET_PARAM_FLAG;
 const readInput = (): string => {
 	if (useStdin) {
 		return readStdin();
 	}
 	return readClipboard();
 };
-const raw = readInput();
-if (raw === "") {
-	fail("입력이 비어 있습니다. 콘솔에서 접속 문자열을 복사한 뒤 다시 실행하세요.");
-}
-const connection = normalizeConnection(raw);
+const resolveConnection = (): { readonly value: string; readonly label: string } => {
+	if (useSetParam) {
+		return setParameter(variable, assignmentArgument);
+	}
+	const raw = readInput();
+	if (raw === "") {
+		return fail("입력이 비어 있습니다. 콘솔에서 접속 문자열을 복사한 뒤 다시 실행하세요.");
+	}
+	return normalizeConnection(raw);
+};
+const connection = resolveConnection();
 writeVariable(variable, connection.value);
 console.log(`${variable} → ${connection.label}`);
-if (!useStdin) {
+if (!useStdin && !useSetParam) {
 	clearClipboard();
 }
