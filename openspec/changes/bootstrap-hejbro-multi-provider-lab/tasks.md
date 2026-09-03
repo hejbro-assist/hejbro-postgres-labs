@@ -1,9 +1,9 @@
 ## 1. 프로젝트 골격과 의존성
 
-- [ ] 1.1 `package.json`에 `type: module`, `packageManager`(pnpm 11 고정), 스크립트 자리(`target`, `local-pg`, `finding`, `verify`, `check-types`)를 추가하고 `pnpm install`이 성공하는지 확인한다
-- [ ] 1.2 `hejbro`, `@hejbro/pg`, `@hejbro/nile`, `@hejbro/supabase`를 `0.2.0-pre.0` 정확 고정으로, `pg`·`@types/pg`·`typescript`를 devDependency로 추가하고 `pnpm exec hejbro --help`가 `v0.2.0-pre.0`을 출력하는지 확인한다
-- [ ] 1.3 `tsconfig.json`(ESM, strict, `noEmit`)을 만들고 `pnpm check-types`가 빈 프로젝트에서 통과하는지 확인한다
-- [ ] 1.4 `pnpm exec hejbro init`으로 `hejbro.config.ts`, `migrations/`, `hejbro.snapshot.json`을 생성하고 design D2대로 `entry`·`presets: []`를 설정한 뒤 파일 세 개가 존재하는지 확인한다
+- [x] 1.1 `package.json`에 `type: module`, `packageManager`(pnpm 11 고정), 스크립트 자리(`target`, `local-pg`, `finding`, `verify`, `check-types`)를 추가하고 `pnpm install`이 성공하는지 확인한다
+- [x] 1.2 `hejbro`, `@hejbro/pg`, `@hejbro/nile`, `@hejbro/supabase`를 `0.2.0-pre.0` 정확 고정으로, `pg`·`@types/pg`·`typescript`를 devDependency로 추가하고 `pnpm exec hejbro --help`가 `v0.2.0-pre.0`을 출력하는지 확인한다
+- [x] 1.3 `tsconfig.json`(ESM, strict, `noEmit`)을 만들고 `pnpm check-types`가 빈 프로젝트에서 통과하는지 확인한다
+- [x] 1.4 `pnpm exec hejbro init`으로 `hejbro.config.ts`, `migrations/`, `hejbro.snapshot.json`을 생성하고 design D2대로 `entry`·`presets: []`를 설정한 뒤 파일 세 개가 존재하는지 확인한다
 
 ## 2. credential 보호 장치
 
