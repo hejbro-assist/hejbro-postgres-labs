@@ -32,7 +32,7 @@
 Nile·Supabase preset은 별도 설정 파일 `hejbro.nile.config.ts`, `hejbro.supabase.config.ts`(entry·migrations·snapshot은 같고 `presets`만 다름)로 두고, `hejbro verify --config <file>`을 "이 선언이 그 provider의 검증을 통과하는가"를 묻는 게이트로만 쓴다. preset이 스냅샷 텍스트를 바꿔 verify가 실패하면 그 사실 자체를 finding으로 기록하고 게이트는 `generate --config`의 오류 유무로 대체한다(Open Questions 참고).
 
 ### D3. 타깃 스크립트는 환경 변수를 자식 프로세스 env로만 넘긴다
-`scripts/target.mjs <target> <migrate|status|check|doctor>`가 타깃 이름을 환경 변수 이름으로 매핑하고, `DATABASE_URL`을 자식 프로세스의 env에 넣어 `hejbro <cmd>`를 spawn한다. `--url` 플래그는 쓰지 않는다. argv는 `ps`와 셸 히스토리에 남지만 env는 그렇지 않기 때문이다. `.env` 로딩은 `node --env-file=.env`로 하고 dotenv 의존성을 추가하지 않는다. `.env`가 없으면 Node가 실패하므로 `package.json` 스크립트는 `--env-file-if-exists=.env`를 쓴다(Node 22.9+).
+`scripts/target.ts <target> <migrate|status|check|doctor>`가 타깃 이름을 환경 변수 이름으로 매핑하고, `DATABASE_URL`을 자식 프로세스의 env에 넣어 `hejbro <cmd>`를 spawn한다. `--url` 플래그는 쓰지 않는다. argv는 `ps`와 셸 히스토리에 남지만 env는 그렇지 않기 때문이다. 스크립트는 TypeScript(`.ts`)로 쓰고 Node 24의 내장 타입 스트리핑으로 직접 실행한다(빌드 단계 없음, 하우스 룰 적용 대상). `.env` 로딩은 `node --env-file-if-exists=.env`로 하고 dotenv 의존성을 추가하지 않는다. `.env`가 없으면 Node가 실패하므로 `package.json` 스크립트는 `--env-file-if-exists=.env`를 쓴다(Node 22.9+).
 
 ### D4. 출력 마스킹은 URL 파싱으로 한다
 타깃을 보고할 때 `new URL(value)`로 파싱해 `hostname`과 `pathname`만 출력한다. 정규식으로 비밀번호를 지우는 방식은 특수문자가 들어간 비밀번호에서 새는 경우가 있어 채택하지 않는다. 파싱에 실패하면 "형식이 잘못됨"만 출력하고 원문은 출력하지 않는다. `hejbro` 자체가 오류 메시지에 URL을 포함하는지는 첫 실행에서 확인하고, 포함한다면 finding으로 기록하고 스크립트에서 stderr를 후처리한다.
@@ -59,7 +59,7 @@ compose 플러그인이 없으므로 `scripts/local-pg.sh up|down|logs`가 `post
 `tenants` 테이블은 선언하지 않는다. Nile은 내장 `public.tenants`를 갖고 있어 충돌하고, 다른 provider에서는 실험 목적상 필요 없다. 두 단계로 나누는 이유는 "체인이 두 개 이상일 때 ledger가 순서를 지키는가"를 네 타깃에서 확인하기 위해서다.
 
 ### D10. 발견 사항 파일과 게시 스크립트
-`findings/YYYY-MM-DD-<slug>.md`는 YAML frontmatter(`title`, `hejbro_version`, `provider`, `kind`, `status`, `discussion`)와 본문으로 구성한다. `scripts/finding.mjs validate|post <file>`가 frontmatter를 파싱(의존성 없이 `---` 블록을 직접 파싱, 값은 단순 스칼라만 허용)하고, `post`는 `gh api graphql`로 `repository.id`와 `discussionCategories`를 조회한 뒤 `createDiscussion`을 호출한다. 카테고리 대응은 spec을 따른다. 게시 전 secretlint를 해당 파일에 실행해 비밀이 있으면 거부한다. 게시 후 URL을 frontmatter에 써 넣는다. 템플릿은 `findings/_template.md`에 두고 validate 대상에서 제외한다.
+`findings/YYYY-MM-DD-<slug>.md`는 YAML frontmatter(`title`, `hejbro_version`, `provider`, `kind`, `status`, `discussion`)와 본문으로 구성한다. `scripts/finding.ts validate|post <file>`가 frontmatter를 파싱(의존성 없이 `---` 블록을 직접 파싱, 값은 단순 스칼라만 허용)하고, `post`는 `gh api graphql`로 `repository.id`와 `discussionCategories`를 조회한 뒤 `createDiscussion`을 호출한다. 카테고리 대응은 spec을 따른다. 게시 전 secretlint를 해당 파일에 실행해 비밀이 있으면 거부한다. 게시 후 URL을 frontmatter에 써 넣는다. 템플릿은 `findings/_template.md`에 두고 validate 대상에서 제외한다.
 gh 래퍼가 디렉터리 기준으로 계정을 바꾸므로 스크립트는 `gh`를 그대로 호출하되, 게시 직전 `gh api user`로 로그인이 `hejbro-assist`인지 확인하고 아니면 거부한다.
 
 ### D11. CI는 DB 없는 검사 네 가지

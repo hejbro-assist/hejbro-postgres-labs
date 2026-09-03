@@ -15,11 +15,11 @@
 
 ## 3. 타깃 스크립트와 로컬 Postgres
 
-- [ ] 3.1 `scripts/local-pg.sh up|down|logs`를 작성한다(`postgres:18-alpine`, 컨테이너 `hejbro-lab-pg`, 포트 `54329`, DB `hejbro_lab`, `pg_isready` 대기). `up`을 두 번 실행해 컨테이너가 하나만 있고 두 번째 실행이 exit 0인지 확인한다
-- [ ] 3.2 `scripts/target.mjs`의 타깃 → 변수 매핑, 알 수 없는 타깃 거부, 미설정 변수 안내(값 미출력)를 구현하고 `pnpm target planetscale status`와 변수 없는 `pnpm target nile status`가 각각 안내 메시지와 함께 exit 1인지 확인한다
-- [ ] 3.3 `scripts/target.mjs`에 `migrate|status|check|reset` 실행(자식 프로세스 env로 `DATABASE_URL` 전달, argv에 URL 없음)과 URL 파싱 기반 마스킹(D4), 비로컬 host의 `sslmode` 누락 경고, `.env` 권한 600 경고를 구현하고 `pnpm target postgres status` 출력에 `:postgres@`가 없는지 확인한다
-- [ ] 3.4 `scripts/target.mjs doctor`를 구현하고(`pg` 클라이언트로 `select version()` 시도, 설정됨/미설정/연결 성공/실패 사유만 출력) `POSTGRES_DATABASE_URL`만 있는 상태에서 실행해 네 행이 기대대로 표시되는지 확인한다
-- [ ] 3.5 `package.json` 스크립트를 `node --env-file-if-exists=.env scripts/target.mjs` 형태로 연결하고 `.env`가 없을 때도 `pnpm target doctor`가 실행되는지 확인한다
+- [x] 3.1 `scripts/local-pg.sh up|down|logs`를 작성한다(`postgres:18-alpine`, 컨테이너 `hejbro-lab-pg`, 포트 `54329`, DB `hejbro_lab`, `pg_isready` 대기). `up`을 두 번 실행해 컨테이너가 하나만 있고 두 번째 실행이 exit 0인지 확인한다
+- [x] 3.2 `scripts/target.ts`의 타깃 → 변수 매핑, 알 수 없는 타깃 거부, 미설정 변수 안내(값 미출력)를 구현하고 `pnpm target planetscale status`와 변수 없는 `pnpm target nile status`가 각각 안내 메시지와 함께 exit 1인지 확인한다
+- [x] 3.3 `scripts/target.ts`에 `migrate|status|check|reset` 실행(자식 프로세스 env로 `DATABASE_URL` 전달, argv에 URL 없음)과 URL 파싱 기반 마스킹(D4), 비로컬 host의 `sslmode` 누락 경고, `.env` 권한 600 경고를 구현하고 `pnpm target postgres status` 출력에 `:postgres@`가 없는지 확인한다
+- [x] 3.4 `scripts/target.ts doctor`를 구현하고(`pg` 클라이언트로 `select version()` 시도, 설정됨/미설정/연결 성공/실패 사유만 출력) `POSTGRES_DATABASE_URL`만 있는 상태에서 실행해 네 행이 기대대로 표시되는지 확인한다
+- [x] 3.5 `package.json` 스크립트를 `node --env-file-if-exists=.env scripts/target.ts` 형태로 연결하고 `.env`가 없을 때도 `pnpm target doctor`가 실행되는지 확인한다
 
 ## 4. portable core 스키마
 
@@ -31,8 +31,8 @@
 ## 5. 발견 사항 기록과 게시
 
 - [ ] 5.1 `findings/_template.md`와 `findings/README.md`(필드 설명, kind→카테고리 대응표)를 작성한다
-- [ ] 5.2 `scripts/finding.mjs validate <file|all>`을 구현하고(frontmatter 필수 필드, `kind`·`provider` 허용값, bug/improvement의 세 섹션) 유효한 파일은 exit 0, `hejbro_version` 누락 파일은 필드 이름과 함께 exit 1인지 확인한다
-- [ ] 5.3 `scripts/finding.mjs post <file>`을 구현한다(secretlint 사전 검사, `gh api user`로 `hejbro-assist` 확인, GraphQL로 repository·category id 조회 후 `createDiscussion`, URL을 frontmatter에 기록, URL이 있으면 거부). 접속 문자열이 든 파일로 실행해 거부되는지, `discussion`이 채워진 파일로 실행해 중복 생성이 없는지 확인한다
+- [ ] 5.2 `scripts/finding.ts validate <file|all>`을 구현하고(frontmatter 필수 필드, `kind`·`provider` 허용값, bug/improvement의 세 섹션) 유효한 파일은 exit 0, `hejbro_version` 누락 파일은 필드 이름과 함께 exit 1인지 확인한다
+- [ ] 5.3 `scripts/finding.ts post <file>`을 구현한다(secretlint 사전 검사, `gh api user`로 `hejbro-assist` 확인, GraphQL로 repository·category id 조회 후 `createDiscussion`, URL을 frontmatter에 기록, URL이 있으면 거부). 접속 문자열이 든 파일로 실행해 거부되는지, `discussion`이 채워진 파일로 실행해 중복 생성이 없는지 확인한다
 
 ## 6. CI
 

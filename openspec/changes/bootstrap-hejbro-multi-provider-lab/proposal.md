@@ -5,7 +5,7 @@ hejbro(TypeScript 선언 → 결정적 마이그레이션 SQL)를 Neon, Nile, Su
 ## What Changes
 
 - hejbro 프로젝트 골격: `hejbro.config.ts`, 선언 파일, `migrations/`, `hejbro.snapshot.json`. 버전은 네 provider 드라이버가 모두 존재하는 `0.2.0-pre.0` 라인으로 고정한다.
-- provider 네 곳(neon, nile, supabase, postgres)을 하나의 마이그레이션 체인에 대한 "타깃"으로 정의하고, 타깃 이름으로 `migrate`/`status`/`check`를 실행하는 스크립트를 둔다. 순정 Postgres 타깃은 Docker `postgres:17-alpine` 컨테이너를 올리는 스크립트로 제공한다.
+- provider 네 곳(neon, nile, supabase, postgres)을 하나의 마이그레이션 체인에 대한 "타깃"으로 정의하고, 타깃 이름으로 `migrate`/`status`/`check`를 실행하는 스크립트를 둔다. 순정 Postgres 타깃은 Docker `postgres:18-alpine` 컨테이너를 올리는 스크립트로 제공한다.
 - 네 provider가 공통으로 받아들이는 "portable core" 샘플 스키마 하나를 선언하고, 네 타깃 모두에서 `migrate` → `check` 통과를 확인한다. Nile은 RLS와 사용자 함수를 거부하므로 샘플은 테이블, CHECK, 인덱스, FK로 한정한다.
 - credential 다층 보호: `.env`는 gitignore, `.env.example`만 커밋, secretlint pre-commit 훅, Claude Code의 `.env` 읽기 차단, 스크립트 출력에서 접속 문자열 마스킹, GitHub push protection(이미 켜짐) 유지.
 - 발견 사항 기록 틀: `findings/`에 한 건당 파일 하나(템플릿: hejbro 버전, provider, 재현 절차, 기대/실제, 분류, Discussion 링크)를 남기고, 이를 hejbro Discussions에 올리는 스크립트를 둔다. 분류별 카테고리는 버그·질문 → Q&A, 개선·기능 요청 → Ideas, 적용 사례 → Show and tell.
