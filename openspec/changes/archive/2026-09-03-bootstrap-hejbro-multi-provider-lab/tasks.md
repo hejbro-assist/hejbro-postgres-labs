@@ -48,7 +48,7 @@
 ## 8. 네 타깃 적용과 대조 (검증)
 
 - [x] 8.1 `postgres` 타깃에 `migrate` → `check` → `migrate`(재실행)를 돌려 exit 0 / 0 / "nothing to apply"인지 확인하고 결과를 기록한다
-- [ ] 8.2 `nile` 타깃에 같은 순서를 돌린다. `lab` 스키마나 FK가 거부되면 D9의 리스크 절차(체인 리셋 후 `public`으로 재생성)를 따르고 finding을 작성한다
+- [x] 8.2 `nile` 타깃에 같은 순서를 돌린다. `lab` 스키마나 FK가 거부되면 D9의 리스크 절차(체인 리셋 후 `public`으로 재생성)를 따르고 finding을 작성한다 — 결과: v1은 42P17, v2는 42622로 거부되어 체인을 두 번 리셋했고 v3에서 migrate 통과. check는 exit 2(Nile이 EXPLAIN 미지원, hejbro 결함 quickstart-now/hejbro#750). 0.2.0-pre.0의 결과로 기록 완료
 - [x] 8.3 `supabase` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [x] 8.4 `neon` 타깃에 같은 순서를 돌리고 결과를 기록한다
 - [x] 8.5 `RESULTS.md`에 네 행(타깃, hejbro 버전, Postgres 버전, migrate/check 결과, 비고)을 작성하고 커밋한다

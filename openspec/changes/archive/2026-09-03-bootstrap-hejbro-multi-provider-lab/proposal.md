@@ -42,3 +42,18 @@ hejbro(TypeScript 선언 → 결정적 마이그레이션 SQL)를 Neon, Nile, Su
 - 새 의존성: `hejbro`, `@hejbro/pg`, `@hejbro/nile`, `@hejbro/supabase`(모두 `0.2.0-pre.0`), `pg`, `typescript`, `secretlint` 계열. `@hejbro/neon`은 쿼리 레이어 전용이라 이 변경에서는 쓰지 않는다.
 - 새 파일: `hejbro.config.ts`, `src/lab.schema.ts`, `migrations/`, `scripts/`, `findings/`, `.env.example`, `.secretlintrc.json`, `.husky/pre-commit`, `.claude/settings.json`, `.github/workflows/ci.yml`.
 - 외부 시스템: Neon, Nile, Supabase 프로젝트 세 개가 사용자 계정에 새로 생성되어야 한다. 로컬 Docker가 필요하다. Discussions 게시는 hejbro-assist 계정으로 이루어진다.
+
+## 결과와 결론 (2026-09-03, hejbro 0.2.0-pre.0)
+
+| 타깃 | Postgres | migrate | check | 비고 |
+|---|---|---|---|---|
+| postgres | 18.6 | 통과 | no differences | `postgres:18-alpine` |
+| neon | 18.6 | 통과 | no differences | direct 접속 |
+| nile | 15.19 | 통과 | exit 2 | Nile이 EXPLAIN을 지원하지 않아 CHECK 비교 불가 |
+| supabase | 17.6 | 통과 | no differences | session pooler + `sslrootcert` |
+
+- 검증 기준 중 "네 타깃 check exit 0"은 Nile에서 hejbro 결함으로 미달했다. 예외로 두지 않고 그 버전의 결과로 기록한다. 다음 hejbro 버전에서 재실행하는 것은 후속 변경 `track-hejbro-releases`의 일이다.
+- portable core 스키마는 Nile 때문에 두 번 바뀌었다: PK/FK에 `tenant_id` 포함, CHECK와 partial index 술어는 열을 보간하지 않는 raw SQL.
+- credential은 저장소 이력, 출력, 에이전트 컨텍스트 어디에도 남지 않았다. 입력은 클립보드 경유 `pnpm env:set`으로 했다.
+- 발견 사항 5건은 hejbro 규칙(영어)에 맞춰 이슈 하나로 묶어 올렸다: quickstart-now/hejbro#750. Discussions 생성은 새 계정 제한으로 막혀 있었다.
+- hejbro reset은 FK 순서 문제로 쓰지 못해 `pnpm target <t> sql`로 직접 리셋했다.
