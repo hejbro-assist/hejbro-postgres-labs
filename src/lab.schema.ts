@@ -48,7 +48,8 @@ export const projects = table(
 	{
 		tenantId: uuid().primaryKey(),
 		id: uuid().primaryKey().defaultRandom(),
-		name: text().notNull(),
+		// 0006 에서 name → title 로 바꿨다. CHECK 와 표현식 인덱스가 이 열을 참조하므로 rename 이 식을 되짚는지 본다.
+		title: text().notNull(),
 		archivedAt: timestamptz(),
 		createdAt: timestamptz().notNull().defaultNow(),
 		metadata: jsonb().notNull().default(sql`'{}'::jsonb`),
@@ -61,10 +62,10 @@ export const projects = table(
 			// 표현식 + unique + partial: 테넌트 안에서 살아 있는 프로젝트 이름은 대소문자 무시 유일.
 			index("projects_tenant_id_lower_name_key")
 				.unique()
-				.on(t.tenantId, sql`lower(${t.name})`)
+				.on(t.tenantId, sql`lower(${t.title})`)
 				.where(isNull(t.archivedAt)),
 		],
-		checks: [check("projects_name_not_blank", sql`length(btrim(${t.name})) > 0`)],
+		checks: [check("projects_name_not_blank", sql`length(btrim(${t.title})) > 0`)],
 	}),
 );
 
