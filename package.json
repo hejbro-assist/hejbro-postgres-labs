@@ -27,10 +27,10 @@
   "type": "module",
   "packageManager": "pnpm@11.20.0",
   "dependencies": {
-    "@hejbro/nile": "0.2.0-pre.0",
-    "@hejbro/pg": "0.2.0-pre.0",
-    "@hejbro/supabase": "0.2.0-pre.0",
-    "hejbro": "0.2.0-pre.0",
+    "@hejbro/nile": "0.2.0-pre.1",
+    "@hejbro/pg": "0.2.0-pre.1",
+    "@hejbro/supabase": "0.2.0-pre.1",
+    "hejbro": "0.2.0-pre.1",
     "pg": "8.23.0"
   },
   "engines": {

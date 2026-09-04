@@ -9,17 +9,17 @@ importers:
   .:
     dependencies:
       '@hejbro/nile':
-        specifier: 0.2.0-pre.0
-        version: 0.2.0-pre.0
+        specifier: 0.2.0-pre.1
+        version: 0.2.0-pre.1
       '@hejbro/pg':
-        specifier: 0.2.0-pre.0
-        version: 0.2.0-pre.0(pg@8.23.0)
+        specifier: 0.2.0-pre.1
+        version: 0.2.0-pre.1(pg@8.23.0)
       '@hejbro/supabase':
-        specifier: 0.2.0-pre.0
-        version: 0.2.0-pre.0
+        specifier: 0.2.0-pre.1
+        version: 0.2.0-pre.1
       hejbro:
-        specifier: 0.2.0-pre.0
-        version: 0.2.0-pre.0
+        specifier: 0.2.0-pre.1
+        version: 0.2.0-pre.1
       pg:
         specifier: 8.23.0
         version: 8.23.0
@@ -161,26 +161,26 @@ packages:
     engines: {node: '>=20.19.0'}
     hasBin: true
 
-  '@hejbro/core@0.2.0-pre.0':
-    resolution: {integrity: sha512-W4MQVoSbdJY1rlO5f1eH8Dhilhu9T7fnt1Pht7xWZ7bXR/Qj6oyn7a0kNMIvy3m/a5sdmytsRGD2lNIwXepPJw==}
+  '@hejbro/core@0.2.0-pre.1':
+    resolution: {integrity: sha512-tVS9KP2vCthvR8O2tIWsFkYsrjqBPBhqX8bgq+fwq/KVrZMQZz+rhslUblOYDUEE/VMpvEzV/Idz6pYLQS0VGg==}
     engines: {node: '>=22.18.0'}
 
-  '@hejbro/nile@0.2.0-pre.0':
-    resolution: {integrity: sha512-NFtUi01GpgGZd5vERp4G4t4duKMt9PiU+JBiHQbl1SzzGjZ10ptZqXSjnn5pvr7YfyKFWUHbiHGohlMKZ1nQ+Q==}
+  '@hejbro/nile@0.2.0-pre.1':
+    resolution: {integrity: sha512-EUO/2j0uwKZfCqfEAQKaMEw2SHVsfT0QQyNz7WhtnhfVeW1wrPjWCGM+dwlvtNqpqw3+Sm7zdAzF+RBGvW/m2Q==}
     engines: {node: '>=22.18.0'}
 
-  '@hejbro/pg@0.2.0-pre.0':
-    resolution: {integrity: sha512-m/xhPJnHbMce2z3Aevf5taixJK1bi5pmFTkrYzjtxom0HfO4WA8IuTgXxpNgsl4AsDMbuTJFBexWxU9vKXfNsw==}
+  '@hejbro/pg@0.2.0-pre.1':
+    resolution: {integrity: sha512-+cgOR5S94jkSRnnWfOcMFufAa+TCplusodzU8xJdajUdimqyI22Nj7rXsySAWydqNWi8ZRrPWiDPeEEukhFNjA==}
     engines: {node: '>=22.18.0'}
     peerDependencies:
       pg: ^8.23.0
 
-  '@hejbro/query@0.2.0-pre.0':
-    resolution: {integrity: sha512-eHqboVk64CJF8BBlCco7Uta/iv70grTyMxparPsdkXoegzV0H+/sXKQFASkvMmlXBYifZZ9IOGN7hsYJ4qPVfQ==}
+  '@hejbro/query@0.2.0-pre.1':
+    resolution: {integrity: sha512-7bIaamJaKvQirgzkFxfhADoYoaCr5p9dae73DczQobJWGk8UTmdILRWXDFq9DJsR0HHvsYqrtKeq0GbNZtfROw==}
     engines: {node: '>=22.18.0'}
 
-  '@hejbro/supabase@0.2.0-pre.0':
-    resolution: {integrity: sha512-xa9UYHKRdfnwoX3vJDgSb8ZZRBGX+rH01jNfmGicjXKBjp5/rXHfMjWOL1d0s+6uwm/LOinRMYzddFryZrRLkw==}
+  '@hejbro/supabase@0.2.0-pre.1':
+    resolution: {integrity: sha512-3IZ7Z+sWWndbKR+od2v5iemphGixlTYTMA7eIs6UPrLumdTrEuOA1L/oefILdWacB/9YmwinOhAEQ+TRlQK5qg==}
     engines: {node: '>=22.18.0'}
 
   '@inquirer/ansi@2.0.7':
@@ -764,8 +764,8 @@ packages:
     resolution: {integrity: sha512-CsNUt5x9LUdx6hnk/E2SZLsDyvfqANZSUq4+D3D8RzDJ2M+HDTIkF60ibS1vHaK55vzgiZw1bEPFG9yH7l33wA==}
     engines: {node: '>=12'}
 
-  hejbro@0.2.0-pre.0:
-    resolution: {integrity: sha512-EnayGuhA/BU/8pEl75RY0dPco0ahNpI3DNWTnzWUBX522fqF4f9WqrKVv9WP3ZZNy+YdFnxbqx2SF31ueuGrcg==}
+  hejbro@0.2.0-pre.1:
+    resolution: {integrity: sha512-D/11OuSaf6lveqTS9QleBtyLoXk/eBFFDkRuzc/yQUzm4hq7yHJQgPX2bR+f9Buk9dW+qrsgOIHq/J1Hwi+kjA==}
     engines: {node: '>=22.18.0'}
     hasBin: true
 
@@ -1365,26 +1365,26 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@hejbro/core@0.2.0-pre.0': {}
+  '@hejbro/core@0.2.0-pre.1': {}
 
-  '@hejbro/nile@0.2.0-pre.0':
+  '@hejbro/nile@0.2.0-pre.1':
     dependencies:
-      '@hejbro/core': 0.2.0-pre.0
-      '@hejbro/query': 0.2.0-pre.0
+      '@hejbro/core': 0.2.0-pre.1
+      '@hejbro/query': 0.2.0-pre.1
 
-  '@hejbro/pg@0.2.0-pre.0(pg@8.23.0)':
+  '@hejbro/pg@0.2.0-pre.1(pg@8.23.0)':
     dependencies:
-      '@hejbro/query': 0.2.0-pre.0
+      '@hejbro/query': 0.2.0-pre.1
       pg: 8.23.0
 
-  '@hejbro/query@0.2.0-pre.0':
+  '@hejbro/query@0.2.0-pre.1':
     dependencies:
-      '@hejbro/core': 0.2.0-pre.0
+      '@hejbro/core': 0.2.0-pre.1
 
-  '@hejbro/supabase@0.2.0-pre.0':
+  '@hejbro/supabase@0.2.0-pre.1':
     dependencies:
-      '@hejbro/core': 0.2.0-pre.0
-      '@hejbro/query': 0.2.0-pre.0
+      '@hejbro/core': 0.2.0-pre.1
+      '@hejbro/query': 0.2.0-pre.1
 
   '@inquirer/ansi@2.0.7': {}
 
@@ -1911,10 +1911,10 @@ snapshots:
 
   has-flag@5.0.1: {}
 
-  hejbro@0.2.0-pre.0:
+  hejbro@0.2.0-pre.1:
     dependencies:
-      '@hejbro/core': 0.2.0-pre.0
-      '@hejbro/query': 0.2.0-pre.0
+      '@hejbro/core': 0.2.0-pre.1
+      '@hejbro/query': 0.2.0-pre.1
       citty: 0.2.2
       jiti: 2.7.0
       tinyglobby: 0.2.17

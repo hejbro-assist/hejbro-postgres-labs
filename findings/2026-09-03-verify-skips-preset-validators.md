@@ -3,8 +3,9 @@ title: hejbro verify --config 는 preset 검증기를 돌리지 않아 provider 
 hejbro_version: 0.2.0-pre.0
 provider: nile
 kind: improvement
-status: posted
+status: resolved
 discussion: https://github.com/quickstart-now/hejbro/issues/750
+resolved_in: 0.2.0-pre.1
 ---
 
 ## 요약
@@ -38,3 +39,12 @@ discussion: https://github.com/quickstart-now/hejbro/issues/750
 
 - Nile: PostgreSQL 15.19, us-west-2
 - 관련 파일: `hejbro.nile.config.ts`, `src/lab.schema.ts`
+
+## 재검증 (0.2.0-pre.1, 2026-09-04)
+
+hejbro #752 로 추적, PR #799 로 수정. `verify` 가 여섯 번째 검사로 등록된 preset 검증기를 실행한다.
+
+- preset 이 등록된 설정으로 `hejbro verify` → `verify: 6 checks passed` (pre.0 은 5).
+- `tasks.tenantId` 에서 `.primaryKey()` 를 뗀 선언으로 다시 실행 → `error[nile-tenant-primary-key-missing]: lab.tasks` 와 `snapshot-stale` 두 건, `2 of 6 checks failed`, exit 1. 기대 결과와 같다.
+- 단, `--config` 는 여전히 무시된다(`verify --config hejbro.nile.config.ts` 는 기본 `hejbro.config.ts` 를 읽어 5 checks). 이것은 별도 발견 사항 `2026-09-04-config-flag-ignored-by-live-commands.md` 로 기록했다. 위 결과는 preset 설정을 `hejbro.config.ts` 이름으로 둔 작업 디렉터리(`scripts/provider-workdir.ts`)에서 얻었다.
+- 저장소 게이트 `pnpm gate:presets` 는 generate 우회를 지우고 이 verify 로 바꿨다.

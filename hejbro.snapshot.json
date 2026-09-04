@@ -2,6 +2,16 @@
 	"dialect": "postgres",
 	"formatVersion": 8,
 	"objects": {
+		"enum:lab.task_priority": {
+			"name": "task_priority",
+			"schema": "lab",
+			"values": [
+				"low",
+				"normal",
+				"high",
+				"urgent"
+			]
+		},
 		"schema:lab": {
 			"name": "lab"
 		},
@@ -12,7 +22,20 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim(name)) > 0"
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "title",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "projects"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -44,7 +67,7 @@
 					}
 				},
 				{
-					"name": "name",
+					"name": "title",
 					"notNull": true,
 					"typeNode": {
 						"typeName": "text"
@@ -68,6 +91,22 @@
 					"typeNode": {
 						"typeName": "timestamptz"
 					}
+				},
+				{
+					"default": {
+						"chunks": [
+							{
+								"chunkKind": "text",
+								"text": "'{}'::jsonb"
+							}
+						],
+						"nodeKind": "sql-template"
+					},
+					"name": "metadata",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "jsonb"
+					}
 				}
 			],
 			"foreignKeys": [],
@@ -80,13 +119,67 @@
 					],
 					"name": "projects_tenant_id_idx",
 					"where": {
-						"chunks": [
-							{
-								"chunkKind": "text",
-								"text": "archived_at is null"
+						"negated": false,
+						"nodeKind": "null-test",
+						"operand": {
+							"column": "archived_at",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "projects"
+						}
+					}
+				},
+				{
+					"columns": [
+						{
+							"name": "metadata",
+							"opclass": "jsonb_path_ops"
+						}
+					],
+					"method": "gin",
+					"name": "projects_metadata_idx"
+				},
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						},
+						{
+							"expression": {
+								"chunks": [
+									{
+										"chunkKind": "text",
+										"text": "lower("
+									},
+									{
+										"chunkKind": "expr",
+										"expr": {
+											"column": "title",
+											"nodeKind": "column-ref",
+											"schema": "lab",
+											"table": "projects"
+										}
+									},
+									{
+										"chunkKind": "text",
+										"text": ")"
+									}
+								],
+								"nodeKind": "sql-template"
 							}
-						],
-						"nodeKind": "sql-template"
+						}
+					],
+					"name": "projects_tenant_id_lower_name_key",
+					"unique": true,
+					"where": {
+						"negated": false,
+						"nodeKind": "null-test",
+						"operand": {
+							"column": "archived_at",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "projects"
+						}
 					}
 				}
 			],
@@ -101,7 +194,20 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim(title)) > 0"
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "title",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "tasks"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -110,24 +216,37 @@
 				},
 				{
 					"expression": {
-						"chunks": [
+						"negated": false,
+						"nodeKind": "in-list",
+						"operand": {
+							"column": "status",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "tasks"
+						},
+						"values": [
 							{
-								"chunkKind": "text",
-								"text": "status in ("
+								"literal": {
+									"literalKind": "string",
+									"value": "todo"
+								},
+								"nodeKind": "literal"
 							},
 							{
-								"chunkKind": "expr",
-								"expr": {
-									"nodeKind": "raw-sql",
-									"sql": "'todo', 'doing', 'done'"
-								}
+								"literal": {
+									"literalKind": "string",
+									"value": "doing"
+								},
+								"nodeKind": "literal"
 							},
 							{
-								"chunkKind": "text",
-								"text": ")"
+								"literal": {
+									"literalKind": "string",
+									"value": "done"
+								},
+								"nodeKind": "literal"
 							}
-						],
-						"nodeKind": "sql-template"
+						]
 					},
 					"name": "tasks_status_allowed"
 				}
@@ -191,7 +310,7 @@
 						},
 						"nodeKind": "literal"
 					},
-					"name": "position",
+					"name": "sort_order",
 					"notNull": true,
 					"typeNode": {
 						"typeName": "integer"
@@ -208,6 +327,22 @@
 					"notNull": true,
 					"typeNode": {
 						"typeName": "timestamptz"
+					}
+				},
+				{
+					"default": {
+						"literal": {
+							"literalKind": "string",
+							"value": "normal"
+						},
+						"nodeKind": "literal"
+					},
+					"name": "priority",
+					"notNull": true,
+					"typeNode": {
+						"enumName": "task_priority",
+						"enumSchema": "lab",
+						"typeName": "enum"
 					}
 				}
 			],
@@ -237,10 +372,199 @@
 						}
 					],
 					"name": "tasks_tenant_id_status_idx"
+				},
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						},
+						{
+							"name": "sort_order"
+						}
+					],
+					"name": "tasks_urgent_idx",
+					"where": {
+						"left": {
+							"column": "priority",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "tasks"
+						},
+						"nodeKind": "comparison",
+						"operator": "=",
+						"right": {
+							"literal": {
+								"literalKind": "string",
+								"value": "urgent"
+							},
+							"nodeKind": "literal"
+						}
+					}
 				}
 			],
 			"name": "tasks",
 			"primaryKeyName": "tasks_pkey",
+			"schema": "lab"
+		},
+		"view:lab.open_tasks": {
+			"columns": [
+				"tenant_id",
+				"id",
+				"project_id",
+				"project_title",
+				"title",
+				"status",
+				"priority",
+				"sort_order"
+			],
+			"name": "open_tasks",
+			"query": {
+				"distinct": null,
+				"from": {
+					"schema": "lab",
+					"table": "tasks"
+				},
+				"groupBy": [],
+				"having": null,
+				"joins": [
+					{
+						"joinKind": "inner",
+						"on": {
+							"nodeKind": "logical",
+							"operands": [
+								{
+									"left": {
+										"column": "tenant_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "tasks"
+									},
+									"nodeKind": "comparison",
+									"operator": "=",
+									"right": {
+										"column": "tenant_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "projects"
+									}
+								},
+								{
+									"left": {
+										"column": "project_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "tasks"
+									},
+									"nodeKind": "comparison",
+									"operator": "=",
+									"right": {
+										"column": "id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "projects"
+									}
+								}
+							],
+							"operator": "and"
+						},
+						"table": {
+							"schema": "lab",
+							"table": "projects"
+						}
+					}
+				],
+				"limit": null,
+				"offset": null,
+				"orderBy": [],
+				"projection": {
+					"columns": [
+						{
+							"alias": "tenant_id",
+							"expr": {
+								"column": "tenant_id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "id",
+							"expr": {
+								"column": "id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "project_id",
+							"expr": {
+								"column": "project_id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "project_title",
+							"expr": {
+								"column": "title",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "projects"
+							}
+						},
+						{
+							"alias": "title",
+							"expr": {
+								"column": "title",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "status",
+							"expr": {
+								"column": "status",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "priority",
+							"expr": {
+								"column": "priority",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "sort_order",
+							"expr": {
+								"column": "sort_order",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						}
+					],
+					"projectionKind": "columns"
+				},
+				"queryKind": "select",
+				"where": {
+					"negated": false,
+					"nodeKind": "null-test",
+					"operand": {
+						"column": "archived_at",
+						"nodeKind": "column-ref",
+						"schema": "lab",
+						"table": "projects"
+					}
+				}
+			},
 			"schema": "lab"
 		}
 	}

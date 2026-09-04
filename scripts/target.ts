@@ -2,15 +2,22 @@
  * provider 타깃을 이름으로 골라 hejbro 명령을 실행한다.
  *
  *   pnpm target <neon|nile|supabase|postgres> <migrate|status|check|reset> [hejbro 추가 인자]
+ *   pnpm target <neon|nile|supabase|postgres> smoke              # 쿼리 레이어 실측 (scripts/smoke.ts)
  *   pnpm target <neon|nile|supabase|postgres> sql "<statement>"   # 결과를 JSON 줄로 출력
  *   pnpm target doctor
  *
  * 접속 문자열은 자식 프로세스의 환경 변수(DATABASE_URL)로만 전달하고 argv에는
  * 절대 싣지 않는다. 출력은 비밀번호를 마스킹한 뒤 그대로 흘려보낸다.
+ *
+ * hejbro 명령은 `hejbro.<target>.config.ts`가 있으면 그 설정으로 실행한다. `check`가 preset(예: nile의
+ * explainUnavailable)을 알려면 설정 파일이 필요하기 때문이다. pre.1의 live 명령은 `--config`를 무시하므로
+ * scripts/provider-workdir.ts 가 만든 작업 디렉터리를 cwd 로 삼는다.
  */
 import { spawn } from "node:child_process";
 import { statSync } from "node:fs";
+import { resolve } from "node:path";
 import pg from "pg";
+import { prepareProviderWorkdir } from "./provider-workdir.ts";
 
 const TARGET_VARIABLES = {
 	neon: "NEON_DATABASE_URL",
@@ -27,6 +34,10 @@ type HejbroCommand = (typeof HEJBRO_COMMANDS)[number];
 
 const DOCTOR_COMMAND = "doctor";
 const SQL_COMMAND = "sql";
+const SMOKE_COMMAND = "smoke";
+const SMOKE_SCRIPT = "scripts/smoke.ts";
+const TARGET_ENV_NAME = "LAB_TARGET";
+const HEJBRO_BIN = resolve("node_modules/.bin/hejbro");
 const ENV_FILE = ".env";
 const SECURE_MODE = 0o600;
 const CONNECT_TIMEOUT_MILLISECONDS = 8000;
@@ -69,6 +80,14 @@ const maskSecret = (text: string, password: string): string => {
 	return text.split(password).join(MASK);
 };
 
+/** 로컬 타깃의 비밀번호는 .env.example 에 적힌 공개 기본값이라 마스킹하지 않는다 (타깃 이름과 겹쳐 출력을 망친다). */
+const secretToMask = (connection: ParsedConnection): string => {
+	if (connection.isLocal) {
+		return "";
+	}
+	return connection.password;
+};
+
 const warnEnvFilePermissions = (): void => {
 	const mode = (() => {
 		try {
@@ -87,7 +106,7 @@ const warnEnvFilePermissions = (): void => {
 const printUsageAndExit = (message: string): never => {
 	console.error(message);
 	console.error(
-		`usage: pnpm target <${targetNames.join("|")}> <${HEJBRO_COMMANDS.join("|")}> [args]\n       pnpm target <name> ${SQL_COMMAND} "<statement>"\n       pnpm target ${DOCTOR_COMMAND}`,
+		`usage: pnpm target <${targetNames.join("|")}> <${HEJBRO_COMMANDS.join("|")}> [args]\n       pnpm target <name> ${SMOKE_COMMAND}\n       pnpm target <name> ${SQL_COMMAND} "<statement>"\n       pnpm target ${DOCTOR_COMMAND}`,
 	);
 	process.exit(1);
 };
@@ -104,10 +123,14 @@ const readConnectionOrExit = (target: TargetName): string => {
 	return value;
 };
 
-const runHejbro = (
+/** 접속 문자열을 env로만 넘겨 자식 프로세스를 띄우고, 출력의 비밀번호를 마스킹한다. */
+const spawnMasked = (
 	target: TargetName,
-	command: HejbroCommand,
-	extraArguments: ReadonlyArray<string>,
+	describe: string,
+	command: string,
+	commandArguments: ReadonlyArray<string>,
+	extraEnv: Readonly<Record<string, string>>,
+	cwd: string | undefined,
 ): void => {
 	warnEnvFilePermissions();
 	const connectionString = readConnectionOrExit(target);
@@ -123,20 +146,39 @@ const runHejbro = (
 			`warning: ${target} 접속 문자열에 sslmode 가 없습니다. ?sslmode=require 를 붙이는 것을 권장합니다.`,
 		);
 	}
-	console.log(`target ${target} (${connection.label}) → hejbro ${command}`);
-	const child = spawn("pnpm", ["exec", "hejbro", command, ...extraArguments], {
-		env: { ...process.env, DATABASE_URL: connectionString },
+	console.log(`target ${target} (${connection.label}) → ${describe}`);
+	const child = spawn(command, [...commandArguments], {
+		env: { ...process.env, ...extraEnv, DATABASE_URL: connectionString },
 		stdio: ["inherit", "pipe", "pipe"],
+		cwd,
 	});
+	const secret = secretToMask(connection);
 	child.stdout.on("data", (chunk: Buffer) => {
-		process.stdout.write(maskSecret(chunk.toString(), connection.password));
+		process.stdout.write(maskSecret(chunk.toString(), secret));
 	});
 	child.stderr.on("data", (chunk: Buffer) => {
-		process.stderr.write(maskSecret(chunk.toString(), connection.password));
+		process.stderr.write(maskSecret(chunk.toString(), secret));
 	});
 	child.on("close", (code) => {
 		process.exit(code ?? 1);
 	});
+};
+
+const runHejbro = (
+	target: TargetName,
+	command: HejbroCommand,
+	extraArguments: ReadonlyArray<string>,
+): void => {
+	const workdir = prepareProviderWorkdir(target);
+	const describe =
+		workdir === undefined
+			? `hejbro ${command}`
+			: `hejbro ${command} (config: hejbro.${target}.config.ts, cwd: ${workdir})`;
+	spawnMasked(target, describe, HEJBRO_BIN, [command, ...extraArguments], {}, workdir);
+};
+
+const runSmoke = (target: TargetName): void => {
+	spawnMasked(target, `smoke (${SMOKE_SCRIPT})`, "node", [SMOKE_SCRIPT], { [TARGET_ENV_NAME]: target }, undefined);
 };
 
 const STATE_CONFIGURED = "설정됨";
@@ -227,6 +269,8 @@ if (firstArgument === DOCTOR_COMMAND) {
 	printUsageAndExit(
 		`error: 알 수 없는 타깃 '${firstArgument}'. 유효한 타깃: ${targetNames.join(", ")}`,
 	);
+} else if (secondArgument === SMOKE_COMMAND) {
+	runSmoke(firstArgument);
 } else if (secondArgument === SQL_COMMAND) {
 	const [statement = ""] = restArguments;
 	if (statement === "") {
@@ -235,7 +279,7 @@ if (firstArgument === DOCTOR_COMMAND) {
 	await runSql(firstArgument, statement);
 } else if (!isHejbroCommand(secondArgument)) {
 	printUsageAndExit(
-		`error: 알 수 없는 명령 '${secondArgument}'. 유효한 명령: ${HEJBRO_COMMANDS.join(", ")}`,
+		`error: 알 수 없는 명령 '${secondArgument}'. 유효한 명령: ${[...HEJBRO_COMMANDS, SMOKE_COMMAND, SQL_COMMAND].join(", ")}`,
 	);
 } else {
 	runHejbro(firstArgument, secondArgument, restArguments);

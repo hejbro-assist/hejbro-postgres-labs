@@ -3,8 +3,9 @@ title: CHECK 와 partial index 술어의 3단계 열 참조("schema"."table"."co
 hejbro_version: 0.2.0-pre.0
 provider: nile
 kind: bug
-status: posted
+status: resolved
 discussion: https://github.com/quickstart-now/hejbro/issues/750
+resolved_in: 0.2.0-pre.1
 ---
 
 ## 요약
@@ -62,3 +63,11 @@ hejbro 는 CHECK 식과 partial index 의 `where` 술어 안 열 참조를 항�
 
 - Nile: PostgreSQL 15.19 (Debian), us-west-2
 - 같은 SQL 은 순정 Postgres 18.6 과 Neon(PG 18.6)에서 정상
+
+## 재검증 (0.2.0-pre.1, 2026-09-04)
+
+hejbro #754 로 추적, PR #780/#802 로 수정. 테이블 결속 식의 열 참조가 `"projects"."name"` 2단계로 렌더링된다.
+
+- 선언을 `sql\`length(btrim(${t.name})) > 0\``, `isNull(t.archivedAt)`, `inArray(t.status, [...])` 로 되돌려 generate → `0003_requalify_expressions.sql` 의 CHECK 가 `check (length(btrim("projects"."name")) > 0)`, 술어가 `where "projects"."archived_at" is null`. 3단계 참조 없음. 기대 결과와 같다.
+- CHECK 의 2단계 참조는 Nile 이 받는다(직접 SQL 로 확인). 그러나 **partial index 술어의 2단계 참조는 Nile 이 42P01 로 거부**해 `0003` 이 Nile 에서 실패한다. 이 잔여 결함은 `2026-09-04-nile-rejects-two-part-refs-in-index-predicates.md` 로 따로 기록했다. 이 파일은 보고한 오류(42622)가 사라졌으므로 `resolved` 로 둔다.
+- 열 보간을 되찾아 rename 추적이 복구됐다: `projects.name` → `title` 을 `--rename` 으로 바꾸자 `0006` 은 `rename column` 한 문장만 내고 CHECK·표현식 인덱스는 다시 만들지 않는다(Postgres·Neon·Supabase 에서 `check: no differences`).
