@@ -80,6 +80,14 @@ const maskSecret = (text: string, password: string): string => {
 	return text.split(password).join(MASK);
 };
 
+/** 로컬 타깃의 비밀번호는 .env.example 에 적힌 공개 기본값이라 마스킹하지 않는다 (타깃 이름과 겹쳐 출력을 망친다). */
+const secretToMask = (connection: ParsedConnection): string => {
+	if (connection.isLocal) {
+		return "";
+	}
+	return connection.password;
+};
+
 const warnEnvFilePermissions = (): void => {
 	const mode = (() => {
 		try {
@@ -144,11 +152,12 @@ const spawnMasked = (
 		stdio: ["inherit", "pipe", "pipe"],
 		cwd,
 	});
+	const secret = secretToMask(connection);
 	child.stdout.on("data", (chunk: Buffer) => {
-		process.stdout.write(maskSecret(chunk.toString(), connection.password));
+		process.stdout.write(maskSecret(chunk.toString(), secret));
 	});
 	child.stderr.on("data", (chunk: Buffer) => {
-		process.stderr.write(maskSecret(chunk.toString(), connection.password));
+		process.stderr.write(maskSecret(chunk.toString(), secret));
 	});
 	child.on("close", (code) => {
 		process.exit(code ?? 1);
