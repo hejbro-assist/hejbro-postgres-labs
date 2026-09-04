@@ -3,8 +3,8 @@ title: text 비교 모드의 check 는 in (...) CHECK 를 카탈로그의 = ANY(
 hejbro_version: 0.2.0-pre.1
 provider: nile
 kind: improvement
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/826
 ---
 
 ## 요약

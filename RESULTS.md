@@ -59,7 +59,7 @@ Nile은 체인이 0003에서 막혀 `assertSchema`가 `assert-schema-diverged`(9
 1. `verify`·`check`·`migrate`·`status`·`reset`이 `--config`를 조용히 무시(hejbro #819와 같은 사실, `migrate`·`status` 추가) — `findings/2026-09-04-config-flag-ignored-by-live-commands.md`
 2. Nile: partial index 술어의 2단계 참조 42P01 — `findings/2026-09-04-nile-rejects-two-part-refs-in-index-predicates.md`
 3. Nile: text 비교 모드가 `in (...)`과 `= ANY(ARRAY[...])`를 일치시키지 못함 — `findings/2026-09-04-nile-check-in-list-text-mismatch.md`
-4. Nile 플랫폼 제한(표현식 인덱스, 열 rename, 스키마 한정 타입 이름)을 `nilePreset`이 generate 시점에 거르지 못함 — `findings/2026-09-04-nile-preset-misses-platform-limits.md`
+4. Nile 플랫폼 제한(표현식 인덱스, 열 rename, 스키마 한정 타입 이름, 오류 뒤 savepoint 복구)을 `nilePreset`/`nileDriver`가 미리 거르거나 선언하지 못함 — `findings/2026-09-04-nile-preset-misses-platform-limits.md`
 5. `reset`이 선언됐지만 DB에 없는 객체(부분 적용 체인) 때문에 실패 — `findings/2026-09-04-reset-fails-on-partially-applied-chain.md`
 
 ## Nile 상세 (직접 SQL 실측, PG 15.19, 2026-09-04)
@@ -81,17 +81,31 @@ tenant-aware = `tenant_id uuid` 열이 있는 테이블. 스크래치 스키마 
 | `drop constraint` + `add constraint` (0003 형태) | ok | - |
 | `drop index` + `create index` (열 이름 술어) | ok | - |
 | `create or replace view` 본문의 3단계 참조 (hejbro 렌더링 그대로) | ok | - |
+| `savepoint` → 오류 → `rollback to savepoint` | **25P01 current transaction is aborted** | 같은 오류 |
+| `savepoint` → (오류 없음) → `rollback to savepoint` | ok | - |
+| `create temporary table` | - | **not supported** |
 | join select의 3단계 참조 | ok (테넌트 컨텍스트 없이). 컨텍스트가 있으면 테넌트가 등록돼 있어야 함 | - |
 
 hejbro 쪽 함의: `nilePreset`은 표현식 인덱스·enum 열·rename을 generate 시점에 거르지 않는다(finding 4). 렌더러는 인덱스 술어의 열 참조를 Nile에서는 열 이름만으로 내야 한다(finding 2). #772의 view·join 항목은 Nile에서 통과했다.
 
 ### Nile 쿼리 레이어 (일회성 스크립트, 0001·0002 상태 선언)
 
-NILE_QUERY_WITNESS_PLACEHOLDER
+`nileDriver(pgDriver)` + `db(schema, driver, { context: () => asTenant(id) })` 로 0001·0002 상태(projects.name, tasks.position)를 선언한 스크립트(`.hejbro-target/nile-query-witness.ts`, 커밋하지 않음).
+
+| 단계 | 결과 |
+|---|---|
+| 컨텍스트 없는 select | `context-required` 로 즉시 거부 (설계대로) |
+| 테넌트 등록 (`driver.execute`, 컨텍스트 없이) | ok |
+| insert project / 2행 insert (한 테넌트) | ok |
+| join select — 렌더링 `select "lab"."tasks"."id" … from "lab"."tasks" inner join "lab"."projects" on …` (3단계 참조) | **ok**, 2행 (#772의 query 항목: Nile 통과) |
+| 전체 테이블 projection + join (17f5495 스키마 한정 렌더링) | ok |
+| 중첩 트랜잭션 안 CHECK 위반 → savepoint 롤백 | **실패** `savepoint-rollback-failed` (cause `query-execution-failed`). 이후 바깥 트랜잭션은 25P01 로 모두 실패 |
+
+직접 SQL로 재현: `begin; savepoint s; <CHECK 위반 insert>; rollback to savepoint s` → `25P01 current transaction is aborted` (tenant-aware·plain 모두). 오류 없이 `rollback to savepoint` 만 하면 통과한다. 즉 **Nile은 오류 뒤의 savepoint 복구를 지원하지 않는다.** hejbro 의 `tx.transaction()` 오류 격리 계약은 Nile 에서 성립하지 않는다(finding 4에 항목 추가).
 
 ### Nile reset (0001·0002 선언으로)
 
-NILE_RESET_WITNESS_PLACEHOLDER
+`.hejbro-target/nile-old/`에 pre.0 시점(481fdb0)의 선언·스냅샷·0001·0002 를 두고 실행. `reset` → `table:lab.tasks, table:lab.projects, schema:lab` 3객체 → `--confirm-drop …:3` → **exit 0**, `lab` 스키마 없음, ledger 비움. `CASCADE` 없이 테이블→스키마 순으로 드롭돼 Nile 에서도 #753 픽스가 동작한다. 이어서 `migrate` 로 0001·0002 를 다시 적용했다(현재 Nile 상태).
 
 ## 이력
 

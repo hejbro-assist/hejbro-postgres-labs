@@ -3,8 +3,8 @@ title: Nile 은 partial index 술어의 2단계 열 참조("table"."column")를 
 hejbro_version: 0.2.0-pre.1
 provider: nile
 kind: bug
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/825
 ---
 
 ## 요약

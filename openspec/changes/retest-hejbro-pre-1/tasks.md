@@ -16,7 +16,7 @@
 - [x] 3.1 #752: `tasks.tenantId`에서 `.primaryKey()`를 임시로 떼고 `pnpm exec hejbro verify --config hejbro.nile.config.ts`가 `nile-tenant-primary-key-missing`으로 exit 1인지 확인한 뒤 원복하고, 결과를 `findings/2026-09-03-verify-skips-preset-validators.md`의 재검증 절과 `status`/`resolved_in`에 기록한다
 - [x] 3.2 #753: postgres 타깃에 `pnpm target postgres reset` → 안내된 `--confirm-drop` 재실행이 exit 0이고 `lab` 스키마가 없으며 `status`가 ledger 비어 있음을 보고하는지 확인한 뒤 `migrate`로 되돌리고, 결과를 `findings/2026-09-03-reset-drops-referenced-table-first.md`에 기록한다
 - [x] 3.3 #756: `.claude/skills/openspec-*/SKILL.md`의 sha256을 찍고 `npx skills add quickstart-now/hejbro -s hejbro -y -a claude-code`를 실행한 뒤 해시가 같고 `.claude/skills/hejbro`만 바뀌었는지, `skills-lock.json`에 openspec 경로가 없는지 확인해 `findings/2026-09-03-skills-add-installs-internal-skills.md`에 기록한다. 갱신된 스킬의 `version`도 적는다
-- [ ] 3.4 #754·#755는 4.1과 5.2에서 확인한 뒤 `findings/2026-09-03-nile-rejects-qualified-column-refs.md`, `findings/2026-09-03-check-cannot-compare-checks-on-nile.md`에 기록한다
+- [x] 3.4 #754·#755는 4.1과 5.2에서 확인한 뒤 `findings/2026-09-03-nile-rejects-qualified-column-refs.md`, `findings/2026-09-03-check-cannot-compare-checks-on-nile.md`에 기록한다
 
 ## 4. 체인 확장 (각 파일은 로컬 postgres에 먼저 적용)
 
@@ -34,14 +34,14 @@
 
 ## 6. 네 타깃 적용 (검증)
 
-- [ ] 6.1 nile: `migrate`(0003~0008) → `check` → `smoke`를 실행하고 파일별 수용 여부·SQLSTATE, `check` exit 코드(#755), `smoke` 각 단계 결과(#772 조인 렌더링 포함)를 기록한다. 거부된 파일이 있으면 finding을 작성한다
-- [ ] 6.2 supabase: 같은 순서를 돌리고 preset 경고 출력과 함께 기록한다
-- [ ] 6.3 neon: 같은 순서를 돌리고 기록한다
-- [ ] 6.4 네 타깃 모두 `reset --confirm-drop` → `migrate`(전체 체인) → `check` → `smoke`를 돌려 fresh apply 결과를 기록한다. Nile은 reset의 drop 순서(view, enum 포함)와 `CASCADE` 없는 드롭이 통과하는지 본다
+- [x] 6.1 nile: `migrate`(0003~0008) → `check` → `smoke`를 실행하고 파일별 수용 여부·SQLSTATE, `check` exit 코드(#755), `smoke` 각 단계 결과(#772 조인 렌더링 포함)를 기록한다. 거부된 파일이 있으면 finding을 작성한다
+- [x] 6.2 supabase: 같은 순서를 돌리고 preset 경고 출력과 함께 기록한다
+- [x] 6.3 neon: 같은 순서를 돌리고 기록한다
+- [x] 6.4 네 타깃 모두 `reset --confirm-drop` → `migrate`(전체 체인) → `check` → `smoke`를 돌려 fresh apply 결과를 기록한다. Nile은 reset의 drop 순서(view, enum 포함)와 `CASCADE` 없는 드롭이 통과하는지 본다
 
 ## 7. 결과 기록과 보고
 
-- [ ] 7.1 `RESULTS.md`를 pre.1 기준으로 다시 쓴다: 타깃 4행(hejbro, Postgres, migrate, check, reset+fresh, smoke), 마이그레이션 파일별 × 타깃 수용 표, #750 항목별 재검증 표, 남은 pre.0 절은 "이력"으로 이동. `README.md`의 리셋 안내를 `pnpm target <t> reset`으로 바꾼다
-- [ ] 7.2 새 발견 사항을 `findings/2026-09-04-*.md`로 작성하고 `pnpm finding validate all`이 통과하는지 확인한다. 열려 있는 hejbro 이슈(#772, #778, #782 등)와 겹치는 건은 파일에 그 번호를 적는다
-- [ ] 7.3 #750에 재검증 결과 코멘트(영어, 항목별 표)를 올리고, 겹치지 않는 새 발견은 새 이슈(제목에 `0.2.0-pre.1`)로 올린 뒤 finding 파일의 `discussion`에 URL을 기록한다
+- [x] 7.1 `RESULTS.md`를 pre.1 기준으로 다시 쓴다: 타깃 4행(hejbro, Postgres, migrate, check, reset+fresh, smoke), 마이그레이션 파일별 × 타깃 수용 표, #750 항목별 재검증 표, 남은 pre.0 절은 "이력"으로 이동. 리셋 안내(`RESULTS.md`)를 `pnpm target <t> reset`으로 바꾼다(README에는 리셋 절이 없었다)
+- [x] 7.2 새 발견 사항을 `findings/2026-09-04-*.md`로 작성하고 `pnpm finding validate all`이 통과하는지 확인한다. 열려 있는 hejbro 이슈(#772, #778, #782 등)와 겹치는 건은 파일에 그 번호를 적는다
+- [x] 7.3 #750에 재검증 결과 코멘트(영어, 항목별 표)를 올리고, 겹치지 않는 새 발견은 새 이슈(제목에 `0.2.0-pre.1`)로 올린 뒤 finding 파일의 `discussion`에 URL을 기록한다
 - [ ] 7.4 `git log -p`에서 `://[^/]*:[^@]*@` 패턴이 없는지 확인하고, feature 브랜치를 push해 PR(CI 통과)을 만든다

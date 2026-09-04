@@ -1,10 +1,10 @@
 ---
-title: nilePreset 이 Nile 이 거부하는 세 선언(표현식 인덱스, 스키마 한정 enum 열, 열 rename)을 generate 시점에 거르지 않아 migrate 에서야 실패한다
+title: nilePreset·nileDriver 가 Nile 이 거부하는 네 가지(표현식 인덱스, 스키마 한정 enum 열, 열 rename, 오류 뒤 savepoint 복구)를 미리 거르지 않아 migrate 나 실행 시점에야 실패한다
 hejbro_version: 0.2.0-pre.1
 provider: nile
 kind: improvement
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/827
 ---
 
 ## 요약
@@ -39,12 +39,21 @@ Nile 에서 스크래치 스키마 `labx` 에 실행했다. `labx.projects` 는 
    ```
    hejbro 의 `generate --rename lab.tasks.position=sort_order` 가 이 문장을 낸다(`0005`, `0006`).
 
+4. 오류 뒤 savepoint 복구 (쿼리 레이어 `tx.transaction()` 의 중첩 트랜잭션)
+   ```sql
+   begin; savepoint hejbro_sp_1;
+   insert into lab.tasks (...) values (..., '   ');   -- 23514 (CHECK 위반)
+   rollback to savepoint hejbro_sp_1;                 -- 25P01 current transaction is aborted, commands ignored until end of transaction block
+   ```
+   plain 테이블(`public.zz_sp`)에서도 같다. 오류가 없을 때의 `rollback to savepoint` 는 통과한다. `nileDriver` 로 만든 핸들에서 `tx.transaction(inner => …)` 안의 문장이 실패하면 hejbro 는 `savepoint-rollback-failed` 를 던지고, 바깥 트랜잭션의 나머지 문장은 전부 25P01 로 실패한다. 부수 관찰: `create temporary table` 도 `not supported`.
+
 통과한 것(참고): `create type … as enum`, `alter type … add value`, GIN `jsonb_path_ops`, `drop constraint`/`add constraint`, `drop index`/`create index`(열 이름 술어), 3단계 참조가 든 `create or replace view` 와 join select.
 
 ## 기대 결과
 
 - `nilePreset` 이 표현식 인덱스(`nile-expression-index-unsupported`)와 스키마 한정 타입의 열(또는 `pgEnum` 자체, `nile-enum-column-unsupported`)을 refuse 하거나, enum 열 타입을 Nile 에서는 search_path 에 의존한 이름만으로 렌더링한다.
 - `--rename` 이 Nile preset 아래에서는 적용 불가 경고를 내거나 `references/nile-preset.md` 의 거부 표에 오른다.
+- `nileDriver` 가 "savepoint 복구 불가" 를 드라이버 capability 로 선언해 `tx.transaction()` 이 Nile 에서는 진입 전에 코드 있는 오류로 거부되거나, 문서의 플랫폼 표에 오른다.
 
 ## 실제 결과
 

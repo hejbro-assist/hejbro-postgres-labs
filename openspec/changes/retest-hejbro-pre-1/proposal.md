@@ -30,3 +30,18 @@ hejbro `0.2.0-pre.1`(2026-09-04)이 우리가 보고한 quickstart-now/hejbro#75
 - `findings/2026-09-03-*.md`의 `status`와 재검증 절, 새 findings, `RESULTS.md`.
 - `.claude/skills/hejbro`(pre.1 스킬로 갱신, `-s hejbro` 사용).
 - 검증 기준: 네 타깃에서 `migrate` exit 0, `check` exit 0(Nile 포함), `reset` 후 재`migrate` exit 0, `smoke` exit 0. 어느 하나라도 아니면 원인 층(우리 코드 / hejbro / provider)을 밝혀 finding으로 남긴다. 알려진 미해결 이슈(#772 view/query의 3단계 참조, #781 generated column)는 결과에 "측정값"으로 남기되 spec을 낮추지 않는다.
+
+## 결과와 결론 (2026-09-04, hejbro 0.2.0-pre.1)
+
+| 타깃 | Postgres | migrate 0001~0009 | check | reset → 재적용 | smoke |
+|---|---|---|---|---|---|
+| postgres | 18.6 | 통과 | no differences | 통과 | 12단계 통과 |
+| neon | 18.6 | 통과 (pre.0 ledger 이어받음) | no differences | 통과 | 통과 |
+| supabase | 17.6 | 통과 | no differences | 통과 | 통과 |
+| nile | 15.19 | `0003`에서 42P01 | exit 1/2 | `reset-drop-failed` (42704) | `assert-schema-diverged`에서 정지 |
+
+- #750 다섯 항목: #752·#753·#754(CHECK)·#756(문서)은 해결 확인, #755는 부분(`in (...)` CHECK가 text 비교로 안 맞아 exit 2). 다섯 finding 파일에 재검증 절을 붙였고 넷은 `resolved`.
+- 검증 기준 "네 타깃 migrate·check·reset·smoke exit 0"은 Nile에서 미달했다. 원인 층은 (a) hejbro: 인덱스 술어의 2단계 참조(#825), text 비교의 IN 목록(#826), 부분 적용 체인의 reset(#828), `--config` 무시(#819) — (b) Nile 플랫폼: 표현식 인덱스, 스키마 한정 enum 타입, rename column, 오류 뒤 savepoint 복구 불가(#827). 체인은 Nile용으로 고치지 않고 그대로 두었다.
+- 고급 경로(재한정, enum+jsonb+GIN+표현식 unique partial 인덱스, rename 2건, enum 값 추가 분할, join view)와 쿼리 레이어(`assertSchema`, 세 드라이버, 트랜잭션·중첩 롤백, upsert, 관계 읽기)는 postgres·neon·supabase에서 전부 통과했다. Nile은 직접 SQL과 일회성 스크립트로 파일별·단계별로 측정해 `RESULTS.md`에 남겼다. #772의 view·join 항목은 Nile에서 통과.
+- 구현 중 설계를 한 번 바꿨다(D5): `--config` 자동 첨부 대신 provider 작업 디렉터리(`.hejbro-target/<t>/`). hejbro 픽스가 나오면 지운다.
+- 새 발견 5건은 hejbro 이슈 #825~#828과 #819 코멘트로, 재검증 요약은 #750 코멘트로 올렸다(영어).

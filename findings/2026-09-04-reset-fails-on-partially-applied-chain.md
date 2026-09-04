@@ -3,8 +3,8 @@ title: hejbro reset 이 선언은 됐지만 DB 에 없는 객체를 드롭하려
 hejbro_version: 0.2.0-pre.1
 provider: nile
 kind: bug
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/828
 ---
 
 ## 요약

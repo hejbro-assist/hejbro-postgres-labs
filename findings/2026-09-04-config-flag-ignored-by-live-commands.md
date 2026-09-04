@@ -3,8 +3,8 @@ title: verify·check·migrate·status·reset 이 --config 를 조용히 무시�
 hejbro_version: 0.2.0-pre.1
 provider: all
 kind: bug
-status: draft
-discussion: 
+status: posted
+discussion: https://github.com/quickstart-now/hejbro/issues/819
 ---
 
 ## 요약
