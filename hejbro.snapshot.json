@@ -405,6 +405,167 @@
 			"name": "tasks",
 			"primaryKeyName": "tasks_pkey",
 			"schema": "lab"
+		},
+		"view:lab.open_tasks": {
+			"columns": [
+				"tenant_id",
+				"id",
+				"project_id",
+				"project_title",
+				"title",
+				"status",
+				"priority",
+				"sort_order"
+			],
+			"name": "open_tasks",
+			"query": {
+				"distinct": null,
+				"from": {
+					"schema": "lab",
+					"table": "tasks"
+				},
+				"groupBy": [],
+				"having": null,
+				"joins": [
+					{
+						"joinKind": "inner",
+						"on": {
+							"nodeKind": "logical",
+							"operands": [
+								{
+									"left": {
+										"column": "tenant_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "tasks"
+									},
+									"nodeKind": "comparison",
+									"operator": "=",
+									"right": {
+										"column": "tenant_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "projects"
+									}
+								},
+								{
+									"left": {
+										"column": "project_id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "tasks"
+									},
+									"nodeKind": "comparison",
+									"operator": "=",
+									"right": {
+										"column": "id",
+										"nodeKind": "column-ref",
+										"schema": "lab",
+										"table": "projects"
+									}
+								}
+							],
+							"operator": "and"
+						},
+						"table": {
+							"schema": "lab",
+							"table": "projects"
+						}
+					}
+				],
+				"limit": null,
+				"offset": null,
+				"orderBy": [],
+				"projection": {
+					"columns": [
+						{
+							"alias": "tenant_id",
+							"expr": {
+								"column": "tenant_id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "id",
+							"expr": {
+								"column": "id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "project_id",
+							"expr": {
+								"column": "project_id",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "project_title",
+							"expr": {
+								"column": "title",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "projects"
+							}
+						},
+						{
+							"alias": "title",
+							"expr": {
+								"column": "title",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "status",
+							"expr": {
+								"column": "status",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "priority",
+							"expr": {
+								"column": "priority",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						},
+						{
+							"alias": "sort_order",
+							"expr": {
+								"column": "sort_order",
+								"nodeKind": "column-ref",
+								"schema": "lab",
+								"table": "tasks"
+							}
+						}
+					],
+					"projectionKind": "columns"
+				},
+				"queryKind": "select",
+				"where": {
+					"negated": false,
+					"nodeKind": "null-test",
+					"operand": {
+						"column": "archived_at",
+						"nodeKind": "column-ref",
+						"schema": "lab",
+						"table": "projects"
+					}
+				}
+			},
+			"schema": "lab"
 		}
 	}
 }

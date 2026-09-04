@@ -16,7 +16,9 @@
  * 테넌트 열을 함께 실어 어느 provider에서든 같은 SQL이 나오게 한다.
  */
 import {
+	and,
 	check,
+	defineView,
 	eq,
 	inArray,
 	index,
@@ -26,6 +28,7 @@ import {
 	op,
 	pgEnum,
 	schema,
+	select,
 	sql,
 	table,
 	text,
@@ -106,4 +109,28 @@ export const tasks = table(
 			check("tasks_status_allowed", inArray(t.status, TASK_STATUSES)),
 		],
 	}),
+);
+
+/**
+ * join view 경로 측정용. 살아 있는 프로젝트의 task 를 프로젝트 제목과 함께 본다.
+ * view 본문은 스키마 한정 참조(`"lab"."tasks"."id"`)로 렌더링되므로 Nile 에서 #772 의 측정값이 된다.
+ */
+export const openTasks = defineView(
+	lab,
+	"open_tasks",
+	select(
+		{
+			tenantId: tasks.tenantId,
+			id: tasks.id,
+			projectId: tasks.projectId,
+			projectTitle: projects.title,
+			title: tasks.title,
+			status: tasks.status,
+			priority: tasks.priority,
+			sortOrder: tasks.sortOrder,
+		},
+		tasks,
+	)
+		.innerJoin(projects, and(eq(tasks.tenantId, projects.tenantId), eq(tasks.projectId, projects.id)))
+		.where(isNull(projects.archivedAt)),
 );
