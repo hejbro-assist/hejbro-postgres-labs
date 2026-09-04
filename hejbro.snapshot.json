@@ -8,7 +8,8 @@
 			"values": [
 				"low",
 				"normal",
-				"high"
+				"high",
+				"urgent"
 			]
 		},
 		"schema:lab": {
@@ -371,6 +372,34 @@
 						}
 					],
 					"name": "tasks_tenant_id_status_idx"
+				},
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						},
+						{
+							"name": "sort_order"
+						}
+					],
+					"name": "tasks_urgent_idx",
+					"where": {
+						"left": {
+							"column": "priority",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "tasks"
+						},
+						"nodeKind": "comparison",
+						"operator": "=",
+						"right": {
+							"literal": {
+								"literalKind": "string",
+								"value": "urgent"
+							},
+							"nodeKind": "literal"
+						}
+					}
 				}
 			],
 			"name": "tasks",

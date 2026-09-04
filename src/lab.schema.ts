@@ -17,6 +17,7 @@
  */
 import {
 	check,
+	eq,
 	inArray,
 	index,
 	integer,
@@ -34,7 +35,9 @@ import {
 
 const TASK_STATUSES = ["todo", "doing", "done"] as const;
 const DEFAULT_TASK_STATUS = "todo";
-const TASK_PRIORITIES = ["low", "normal", "high"] as const;
+// "urgent" 는 0007/0008 에서 추가했다. 기존 enum 에 값을 더하고 같은 run 에서 술어에 쓰면 hejbro 가 두 파일로 나눈다.
+const TASK_PRIORITIES = ["low", "normal", "high", "urgent"] as const;
+const URGENT_PRIORITY = "urgent";
 const DEFAULT_TASK_PRIORITY = "normal";
 
 export const lab = schema("lab");
@@ -93,7 +96,11 @@ export const tasks = table(
 				onDelete: "cascade",
 			},
 		],
-		indexes: [index().on(t.tenantId, t.status)],
+		indexes: [
+			index().on(t.tenantId, t.status),
+			// enum 값을 술어에 쓰는 partial index: 값 추가와 같은 run 이라 마이그레이션이 분할된다.
+			index("tasks_urgent_idx").on(t.tenantId, t.sortOrder).where(eq(t.priority, URGENT_PRIORITY)),
+		],
 		checks: [
 			check("tasks_title_not_blank", sql`length(btrim(${t.title})) > 0`),
 			check("tasks_status_allowed", inArray(t.status, TASK_STATUSES)),
