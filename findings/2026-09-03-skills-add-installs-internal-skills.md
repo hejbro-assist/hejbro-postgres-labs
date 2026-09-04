@@ -3,8 +3,9 @@ title: npx skills add quickstart-now/hejbro 가 저장소 내부 .claude/skills 
 hejbro_version: 0.2.0-pre.0
 provider: all
 kind: improvement
-status: posted
+status: resolved
 discussion: https://github.com/quickstart-now/hejbro/issues/750
+resolved_in: 0.2.0-pre.1
 ---
 
 ## 요약
@@ -35,3 +36,10 @@ README의 안내대로 `npx skills add quickstart-now/hejbro` 를 실행하면 `
 - skills CLI: `npx skills@latest` (2026-09-03 기준 최신)
 - 소비자 쪽 OpenSpec: `@fission-ai/openspec` 1.12.0
 - 관련 파일: 소비자 저장소의 `skills-lock.json`
+
+## 재검증 (0.2.0-pre.1, 2026-09-04)
+
+hejbro #756 으로 추적, #771 에서 문서로 해결: README 의 설치 명령이 `npx skills add quickstart-now/hejbro -s hejbro` 로 바뀌었고, `CONTRIBUTING.md` 에 "Reporting a problem" 절과 `.github/ISSUE_TEMPLATE/bug_report.yml` 이 생겼다(#757).
+
+- 문서대로 `-s hejbro` 를 붙여 실행 → `Selected 1 skill: hejbro`, `.claude/skills/hejbro` 만 갱신되고 openspec 스킬 6개의 sha256 은 그대로. `skills-lock.json` 에도 `hejbro` 항목 하나뿐.
+- 다만 `-s` 없이 실행하면(제안했던 두 번째 선택지) pre.1 시점에도 여전히 `.claude/skills/openspec-*` 6개와 `roundtrip-verification` 을 소비자 쪽에 복사해 동명 스킬을 덮어쓴다(2026-09-04 재현). 저장소 내부 스킬이 skills CLI 가 찾는 자리에 그대로 있기 때문이다. 문서 해결을 받아들여 `resolved` 로 두되, 이 잔여 위험은 #750 코멘트에 적었다.

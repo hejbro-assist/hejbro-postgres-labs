@@ -3,8 +3,9 @@ title: hejbro reset 이 FK 로 참조되는 테이블을 먼저 드롭하려다 
 hejbro_version: 0.2.0-pre.0
 provider: all
 kind: bug
-status: posted
+status: resolved
 discussion: https://github.com/quickstart-now/hejbro/issues/750
+resolved_in: 0.2.0-pre.1
 ---
 
 ## 요약
@@ -35,3 +36,11 @@ ledger 는 그대로 2건 적용 상태로 남아 있고, 이후 `hejbro status`
 
 - Postgres 18.6 (`postgres:18-alpine`), Neon PostgreSQL 18.6
 - 확인 문자열의 객체 나열 순서: `table:lab.projects, table:lab.tasks, schema:lab`
+
+## 재검증 (0.2.0-pre.1, 2026-09-04)
+
+hejbro #753 으로 추적, PR #799 로 수정. 선언된 FK 순서대로 드롭한다.
+
+- Postgres 18.6, `0001`·`0002` 적용 상태에서 `hejbro reset` → `reset would drop 3 declared object(s) … table:lab.tasks, table:lab.projects, schema:lab` (참조하는 테이블이 먼저 나열된다).
+- `--confirm-drop hejbro_lab:3` → `reset: dropped every object your declarations manage, and cleared the ledger.` exit 0. `pg_namespace` 에 `lab` 없음, `hejbro.migration_ledger` 0 행, `status` 는 `records no migrations yet` + 2 pending. 기대 결과와 같다.
+- 네 타깃에서 체인 전체(view·enum 포함)를 reset 한 결과는 `RESULTS.md` 의 "리셋 후 재적용" 열에 있다.

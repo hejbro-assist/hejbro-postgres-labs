@@ -42,3 +42,12 @@ check: could not answer -- 3 declared object(s) could not be compared.
 
 - Nile: PostgreSQL 15.19 (Debian), us-west-2
 - 같은 선언은 순정 Postgres 18.6 과 Neon(PG 18.6)에서 `check: no differences.`
+
+## 재검증 (0.2.0-pre.1, 2026-09-04)
+
+hejbro #755 로 추적, PR #780/#795/#802 로 수정. `nilePreset` 이 `explainUnavailable: true` 를 선언하고 `check` 는 그 preset 이 등록돼 있으면 정규화 텍스트 비교로 간다.
+
+- preset 이 등록된 설정으로 `check` → `check-constraint expressions were compared by normalized text on this run …` 안내가 붙고, `length(btrim(name)) > 0` 류 CHECK 2건은 일치한다.
+- `status in ('todo', 'doing', 'done')` 은 카탈로그의 `(status = ANY (ARRAY['todo'::text, …]))` 와 정규화 후에도 달라 `check-not-compared` 1건, **exit 2 그대로**. 기대 결과(exit 0)에 못 미친다. 이 잔여분은 `2026-09-04-nile-check-in-list-text-mismatch.md` 로 기록했다.
+- 주의: `check --config hejbro.nile.config.ts` 로는 preset 이 닿지 않는다(`--config` 무시, `2026-09-04-config-flag-ignored-by-live-commands.md`). 위 결과는 preset 설정을 `hejbro.config.ts` 로 둔 작업 디렉터리에서 얻었다.
+- `status` 는 `posted` 로 유지한다(재현의 마지막 단계가 아직 실패한다).
