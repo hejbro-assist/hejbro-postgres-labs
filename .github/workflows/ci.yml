@@ -24,7 +24,7 @@ jobs:
         run: pnpm check-types
       - name: hejbro verify (shared chain)
         run: pnpm verify
-      - name: provider preset gate (generate with presets, must be a no-op)
+      - name: provider preset gate (verify under each preset workdir)
         run: pnpm gate:presets
       - name: secret scan (whole repository)
         run: pnpm exec secretlint "**/*"

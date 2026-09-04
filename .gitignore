@@ -11,3 +11,6 @@ node_modules/
 # 키/인증서
 *.pem
 *.key
+
+# provider preset 작업 디렉터리 (scripts/provider-workdir.ts 가 만든다)
+.hejbro-target/
