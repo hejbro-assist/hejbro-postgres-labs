@@ -21,6 +21,9 @@ import {
 	index,
 	integer,
 	isNull,
+	jsonb,
+	op,
+	pgEnum,
 	schema,
 	sql,
 	table,
@@ -31,8 +34,13 @@ import {
 
 const TASK_STATUSES = ["todo", "doing", "done"] as const;
 const DEFAULT_TASK_STATUS = "todo";
+const TASK_PRIORITIES = ["low", "normal", "high"] as const;
+const DEFAULT_TASK_PRIORITY = "normal";
 
 export const lab = schema("lab");
+
+/** enum 경로 측정용. Nile 이 tenant-aware 테이블에서 사용자 정의 enum 을 받는지 본다. */
+export const taskPriority = pgEnum(lab, "task_priority", TASK_PRIORITIES);
 
 export const projects = table(
 	lab,
@@ -43,9 +51,19 @@ export const projects = table(
 		name: text().notNull(),
 		archivedAt: timestamptz(),
 		createdAt: timestamptz().notNull().defaultNow(),
+		metadata: jsonb().notNull().default(sql`'{}'::jsonb`),
 	},
 	(t) => ({
-		indexes: [index().on(t.tenantId).where(isNull(t.archivedAt))],
+		indexes: [
+			index().on(t.tenantId).where(isNull(t.archivedAt)),
+			// GIN + 연산자 클래스: jsonb 경로 측정.
+			index("projects_metadata_idx").using("gin").on(op(t.metadata, "jsonb_path_ops")),
+			// 표현식 + unique + partial: 테넌트 안에서 살아 있는 프로젝트 이름은 대소문자 무시 유일.
+			index("projects_tenant_id_lower_name_key")
+				.unique()
+				.on(t.tenantId, sql`lower(${t.name})`)
+				.where(isNull(t.archivedAt)),
+		],
 		checks: [check("projects_name_not_blank", sql`length(btrim(${t.name})) > 0`)],
 	}),
 );
@@ -61,6 +79,7 @@ export const tasks = table(
 		projectId: uuid().notNull(),
 		title: text().notNull(),
 		status: text().notNull().default(DEFAULT_TASK_STATUS),
+		priority: taskPriority.column().notNull().default(DEFAULT_TASK_PRIORITY),
 		position: integer().notNull().default(0),
 		createdAt: timestamptz().notNull().defaultNow(),
 	},

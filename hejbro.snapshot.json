@@ -2,6 +2,15 @@
 	"dialect": "postgres",
 	"formatVersion": 8,
 	"objects": {
+		"enum:lab.task_priority": {
+			"name": "task_priority",
+			"schema": "lab",
+			"values": [
+				"low",
+				"normal",
+				"high"
+			]
+		},
 		"schema:lab": {
 			"name": "lab"
 		},
@@ -81,6 +90,22 @@
 					"typeNode": {
 						"typeName": "timestamptz"
 					}
+				},
+				{
+					"default": {
+						"chunks": [
+							{
+								"chunkKind": "text",
+								"text": "'{}'::jsonb"
+							}
+						],
+						"nodeKind": "sql-template"
+					},
+					"name": "metadata",
+					"notNull": true,
+					"typeNode": {
+						"typeName": "jsonb"
+					}
 				}
 			],
 			"foreignKeys": [],
@@ -92,6 +117,59 @@
 						}
 					],
 					"name": "projects_tenant_id_idx",
+					"where": {
+						"negated": false,
+						"nodeKind": "null-test",
+						"operand": {
+							"column": "archived_at",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "projects"
+						}
+					}
+				},
+				{
+					"columns": [
+						{
+							"name": "metadata",
+							"opclass": "jsonb_path_ops"
+						}
+					],
+					"method": "gin",
+					"name": "projects_metadata_idx"
+				},
+				{
+					"columns": [
+						{
+							"name": "tenant_id"
+						},
+						{
+							"expression": {
+								"chunks": [
+									{
+										"chunkKind": "text",
+										"text": "lower("
+									},
+									{
+										"chunkKind": "expr",
+										"expr": {
+											"column": "name",
+											"nodeKind": "column-ref",
+											"schema": "lab",
+											"table": "projects"
+										}
+									},
+									{
+										"chunkKind": "text",
+										"text": ")"
+									}
+								],
+								"nodeKind": "sql-template"
+							}
+						}
+					],
+					"name": "projects_tenant_id_lower_name_key",
+					"unique": true,
 					"where": {
 						"negated": false,
 						"nodeKind": "null-test",
@@ -248,6 +326,22 @@
 					"notNull": true,
 					"typeNode": {
 						"typeName": "timestamptz"
+					}
+				},
+				{
+					"default": {
+						"literal": {
+							"literalKind": "string",
+							"value": "normal"
+						},
+						"nodeKind": "literal"
+					},
+					"name": "priority",
+					"notNull": true,
+					"typeNode": {
+						"enumName": "task_priority",
+						"enumSchema": "lab",
+						"typeName": "enum"
 					}
 				}
 			],
