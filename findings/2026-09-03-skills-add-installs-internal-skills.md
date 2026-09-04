@@ -3,9 +3,8 @@ title: npx skills add quickstart-now/hejbro 가 저장소 내부 .claude/skills 
 hejbro_version: 0.2.0-pre.0
 provider: all
 kind: improvement
-status: resolved
+status: posted
 discussion: https://github.com/quickstart-now/hejbro/issues/750
-resolved_in: 0.2.0-pre.1
 ---
 
 ## 요약
@@ -39,7 +38,9 @@ README의 안내대로 `npx skills add quickstart-now/hejbro` 를 실행하면 `
 
 ## 재검증 (0.2.0-pre.1, 2026-09-04)
 
-hejbro #756 으로 추적, #771 에서 문서로 해결: README 의 설치 명령이 `npx skills add quickstart-now/hejbro -s hejbro` 로 바뀌었고, `CONTRIBUTING.md` 에 "Reporting a problem" 절과 `.github/ISSUE_TEMPLATE/bug_report.yml` 이 생겼다(#757).
+hejbro #756 으로 추적, #771 에서 README 의 설치 명령을 `npx skills add quickstart-now/hejbro -s hejbro` 로 바꾸고 닫았다("skills CLI 에 제외 수단이 없다"는 판단). 그러나 재현은 그대로 실패한다.
 
-- 문서대로 `-s hejbro` 를 붙여 실행 → `Selected 1 skill: hejbro`, `.claude/skills/hejbro` 만 갱신되고 openspec 스킬 6개의 sha256 은 그대로. `skills-lock.json` 에도 `hejbro` 항목 하나뿐.
-- 다만 `-s` 없이 실행하면(제안했던 두 번째 선택지) pre.1 시점에도 여전히 `.claude/skills/openspec-*` 6개와 `roundtrip-verification` 을 소비자 쪽에 복사해 동명 스킬을 덮어쓴다(2026-09-04 재현). 저장소 내부 스킬이 skills CLI 가 찾는 자리에 그대로 있기 때문이다. 문서 해결을 받아들여 `resolved` 로 두되, 이 잔여 위험은 #750 코멘트에 적었다.
+- 문서대로 `-s hejbro` 를 붙이면 `.claude/skills/hejbro` 만 갱신되고 openspec 스킬 6개의 sha256 은 그대로.
+- `-s` 없이 실행하면 pre.1 시점 `dev` 에서도 `Found 8 skills` — `.claude/skills/openspec-*` 6개와 `roundtrip-verification` 을 소비자 쪽에 복사해 동명 스킬을 덮어쓴다(git 으로 복구했다).
+- 원인은 그대로다: 내부 스킬이 skills CLI 의 탐색 경로(`.claude/skills/`)에 있고, 숨김 표시가 없다. skills CLI 1.5.23 은 `SKILL.md` frontmatter 의 `metadata.internal: true` 를 문서화하고 있고, 스크래치 저장소에서 측정하니 그 표시가 있는 스킬은 `--list` 에도 `-s` 없는 설치에도 나오지 않았다(표시 없는 스킬은 설치됨).
+- 그래서 `resolved` 가 아니라 `posted` 로 되돌리고, 위 측정을 담아 새 이슈로 올렸다: https://github.com/quickstart-now/hejbro/issues/834 (원인 층: hejbro 저장소의 스킬 frontmatter, 픽스는 파일 7개에 `metadata.internal: true`).
