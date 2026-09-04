@@ -309,7 +309,7 @@
 						},
 						"nodeKind": "literal"
 					},
-					"name": "position",
+					"name": "sort_order",
 					"notNull": true,
 					"typeNode": {
 						"typeName": "integer"

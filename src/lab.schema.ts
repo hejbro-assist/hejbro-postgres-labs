@@ -80,7 +80,7 @@ export const tasks = table(
 		title: text().notNull(),
 		status: text().notNull().default(DEFAULT_TASK_STATUS),
 		priority: taskPriority.column().notNull().default(DEFAULT_TASK_PRIORITY),
-		position: integer().notNull().default(0),
+		sortOrder: integer().notNull().default(0),
 		createdAt: timestamptz().notNull().defaultNow(),
 	},
 	(t) => ({
