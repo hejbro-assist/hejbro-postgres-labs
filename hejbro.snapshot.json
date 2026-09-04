@@ -12,7 +12,20 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim(name)) > 0"
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "name",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "projects"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -80,13 +93,14 @@
 					],
 					"name": "projects_tenant_id_idx",
 					"where": {
-						"chunks": [
-							{
-								"chunkKind": "text",
-								"text": "archived_at is null"
-							}
-						],
-						"nodeKind": "sql-template"
+						"negated": false,
+						"nodeKind": "null-test",
+						"operand": {
+							"column": "archived_at",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "projects"
+						}
 					}
 				}
 			],
@@ -101,7 +115,20 @@
 						"chunks": [
 							{
 								"chunkKind": "text",
-								"text": "length(btrim(title)) > 0"
+								"text": "length(btrim("
+							},
+							{
+								"chunkKind": "expr",
+								"expr": {
+									"column": "title",
+									"nodeKind": "column-ref",
+									"schema": "lab",
+									"table": "tasks"
+								}
+							},
+							{
+								"chunkKind": "text",
+								"text": ")) > 0"
 							}
 						],
 						"nodeKind": "sql-template"
@@ -110,24 +137,37 @@
 				},
 				{
 					"expression": {
-						"chunks": [
+						"negated": false,
+						"nodeKind": "in-list",
+						"operand": {
+							"column": "status",
+							"nodeKind": "column-ref",
+							"schema": "lab",
+							"table": "tasks"
+						},
+						"values": [
 							{
-								"chunkKind": "text",
-								"text": "status in ("
+								"literal": {
+									"literalKind": "string",
+									"value": "todo"
+								},
+								"nodeKind": "literal"
 							},
 							{
-								"chunkKind": "expr",
-								"expr": {
-									"nodeKind": "raw-sql",
-									"sql": "'todo', 'doing', 'done'"
-								}
+								"literal": {
+									"literalKind": "string",
+									"value": "doing"
+								},
+								"nodeKind": "literal"
 							},
 							{
-								"chunkKind": "text",
-								"text": ")"
+								"literal": {
+									"literalKind": "string",
+									"value": "done"
+								},
+								"nodeKind": "literal"
 							}
-						],
-						"nodeKind": "sql-template"
+						]
 					},
 					"name": "tasks_status_allowed"
 				}
