@@ -1,8 +1,8 @@
 minimumReleaseAgeExclude:
   - '@fission-ai/openspec@1.12.0'
-  - '@hejbro/core@0.2.0-pre.0'
-  - '@hejbro/nile@0.2.0-pre.0'
-  - '@hejbro/pg@0.2.0-pre.0'
-  - '@hejbro/query@0.2.0-pre.0'
-  - '@hejbro/supabase@0.2.0-pre.0'
-  - hejbro@0.2.0-pre.0
+  - '@hejbro/core@0.2.0-pre.0 || 0.2.0-pre.1'
+  - '@hejbro/nile@0.2.0-pre.0 || 0.2.0-pre.1'
+  - '@hejbro/pg@0.2.0-pre.0 || 0.2.0-pre.1'
+  - '@hejbro/query@0.2.0-pre.0 || 0.2.0-pre.1'
+  - '@hejbro/supabase@0.2.0-pre.0 || 0.2.0-pre.1'
+  - hejbro@0.2.0-pre.0 || 0.2.0-pre.1
