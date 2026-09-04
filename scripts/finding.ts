@@ -27,6 +27,8 @@ const REQUIRED_FIELDS = ["title", "hejbro_version", "provider", "kind", "status"
 const REPRODUCIBLE_KINDS = ["bug", "improvement"] as const;
 const REPRODUCTION_SECTIONS = ["## 재현 절차", "## 기대 결과", "## 실제 결과"] as const;
 const FIELDS_ALLOWED_EMPTY = ["discussion"] as const;
+const RESOLVED_STATUS = "resolved";
+const RESOLVED_IN_FIELD = "resolved_in";
 
 const CATEGORY_BY_KIND = {
 	bug: "Q&A",
@@ -103,7 +105,12 @@ const collectProblems = (path: string): ReadonlyArray<string> => {
 	const sectionProblems = REPRODUCTION_SECTIONS.filter(
 		(section) => needsReproduction && !body.includes(section),
 	).map((section) => `본문 섹션 누락: ${section}`);
-	return [...missing, ...invalid, ...sectionProblems];
+	const resolvedIn = frontmatter[RESOLVED_IN_FIELD] ?? "";
+	const resolvedProblems =
+		frontmatter["status"] === RESOLVED_STATUS && resolvedIn === ""
+			? [`status 가 ${RESOLVED_STATUS} 이면 ${RESOLVED_IN_FIELD} (해결된 hejbro 버전) 이 필요합니다`]
+			: [];
+	return [...missing, ...invalid, ...sectionProblems, ...resolvedProblems];
 };
 
 const listFindingFiles = (): ReadonlyArray<string> =>
