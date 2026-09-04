@@ -52,7 +52,7 @@ Nile은 체인이 0003에서 막혀 `assertSchema`가 `assert-schema-diverged`(9
 | 2 | `reset` FK 순서 | #753 | **해결**. `tasks → projects → schema` 순으로 드롭, exit 0, ledger 비움. 네 타깃 중 셋에서 view·enum 포함 5객체 reset 통과 | `2026-09-03-reset-drops-referenced-table-first.md` resolved |
 | 3 | Nile 3단계 열 참조 42622 | #754 | **해결(CHECK)**. 2단계 렌더링, 42622 사라짐. 그러나 partial index 술어의 2단계 참조는 42P01(아래 신규 2) | `2026-09-03-nile-rejects-qualified-column-refs.md` resolved |
 | 4 | Nile `check` EXPLAIN | #755 | **부분**. text 비교 모드로 2/3 일치, `in (...)`은 비교 불가로 exit 2 유지(아래 신규 3) | `2026-09-03-check-cannot-compare-checks-on-nile.md` posted 유지 |
-| 5 | `skills add`가 내부 스킬 설치 | #756/#771 | **문서로 해결**. README가 `-s hejbro`. `-s` 없이 실행하면 여전히 openspec 스킬 7개를 덮어씀 | `2026-09-03-skills-add-installs-internal-skills.md` resolved |
+| 5 | `skills add`가 내부 스킬 설치 | #756/#771 → #834 | **미해결**. README만 `-s hejbro`로 바뀌었고 `-s` 없이 실행하면 여전히 내부 스킬 7개를 덮어씀. skills CLI의 `metadata.internal: true`가 숨김 수단임을 측정해 #834로 다시 올림 | `2026-09-03-skills-add-installs-internal-skills.md` posted 유지 |
 
 ## 신규 발견 (0.2.0-pre.1)
 
