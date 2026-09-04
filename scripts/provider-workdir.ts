@@ -15,7 +15,8 @@ import { join } from "node:path";
 
 const WORKDIR_ROOT = ".hejbro-target";
 /** 저장소 루트 기준 상대 경로. 작업 디렉터리는 두 단계 아래라 `../../` 로 되돌아간다. */
-const LINKED_ENTRIES = ["src", "migrations", "hejbro.snapshot.json"] as const;
+/** certs 는 supabase 접속 문자열의 상대 경로 `sslrootcert=certs/...` 가 새 cwd 에서도 풀리도록 링크한다. */
+const LINKED_ENTRIES = ["src", "migrations", "hejbro.snapshot.json", "certs"] as const;
 const UP_TO_ROOT = "../..";
 const CONFIG_FILE_NAME = "hejbro.config.ts";
 
