@@ -44,4 +44,4 @@
 - [x] 7.1 `RESULTS.md`를 pre.1 기준으로 다시 쓴다: 타깃 4행(hejbro, Postgres, migrate, check, reset+fresh, smoke), 마이그레이션 파일별 × 타깃 수용 표, #750 항목별 재검증 표, 남은 pre.0 절은 "이력"으로 이동. 리셋 안내(`RESULTS.md`)를 `pnpm target <t> reset`으로 바꾼다(README에는 리셋 절이 없었다)
 - [x] 7.2 새 발견 사항을 `findings/2026-09-04-*.md`로 작성하고 `pnpm finding validate all`이 통과하는지 확인한다. 열려 있는 hejbro 이슈(#772, #778, #782 등)와 겹치는 건은 파일에 그 번호를 적는다
 - [x] 7.3 #750에 재검증 결과 코멘트(영어, 항목별 표)를 올리고, 겹치지 않는 새 발견은 새 이슈(제목에 `0.2.0-pre.1`)로 올린 뒤 finding 파일의 `discussion`에 URL을 기록한다
-- [ ] 7.4 `git log -p`에서 `://[^/]*:[^@]*@` 패턴이 없는지 확인하고, feature 브랜치를 push해 PR(CI 통과)을 만든다
+- [x] 7.4 `git log -p`에서 `://[^/]*:[^@]*@` 패턴이 없는지 확인하고, feature 브랜치를 push해 PR(CI 통과)을 만든다
